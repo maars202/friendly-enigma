@@ -1,0 +1,54 @@
+---
+title: "Project Proposal"
+format: 
+  html: 
+    code-fold: true
+    code-summary: "Show the code"
+    toc: true
+    toc-depth: 4
+execute: 
+  warning: false
+  eval: false
+  echo: true
+editor: visual
+---
+
+## 1. Abstract
+
+## 2. Problem & Motivation
+
+## 3. Project Objectives
+
+## 4. Main Features
+
+## **5. Data Source**
+
+## **6. Literature Review**
+
+## **7. Comparison to Existing Applications**
+
+## **8. UI Prototype**
+
+::: panel-tabset
+#### 1 - EDA
+
+![](images/balls-Page-3.drawio.png)
+
+#### 2 - KDE
+
+![](images/balls-Page-3.drawio-02.png)\
+
+#### 3 - Spatial Cluster
+
+![](images/balls-Page-3.drawio-05.png)
+
+#### 4 - Spatiotemporal
+
+![](images/balls-Page-3.drawio-04.png)
+:::
+
+## **9. Application Architecture**
+
+![](images/balls-Page-3.drawio-08.png)
+
+## **10. Timeline**

@@ -12,5 +12,89 @@
     "title": "About",
     "section": "",
     "text": "About this site\n\n1 + 1\n\n[1] 2"
+  },
+  {
+    "objectID": "projectproposal.html",
+    "href": "projectproposal.html",
+    "title": "Project Proposal",
+    "section": "",
+    "text": "#Project Proposal"
+  },
+  {
+    "objectID": "projectproposal.html#abstract-1",
+    "href": "projectproposal.html#abstract-1",
+    "title": "Project Proposal",
+    "section": "2. Abstract",
+    "text": "2. Abstract\n\nScene 1Scene 2"
+  },
+  {
+    "objectID": "projectproposal.html#abstract",
+    "href": "projectproposal.html#abstract",
+    "title": "Project Proposal",
+    "section": "1. Abstract",
+    "text": "1. Abstract"
+  },
+  {
+    "objectID": "projectproposal.html#problem-motivation",
+    "href": "projectproposal.html#problem-motivation",
+    "title": "Project Proposal",
+    "section": "2. Problem & Motivation",
+    "text": "2. Problem & Motivation"
+  },
+  {
+    "objectID": "projectproposal.html#project-objectives",
+    "href": "projectproposal.html#project-objectives",
+    "title": "Project Proposal",
+    "section": "3. Project Objectives",
+    "text": "3. Project Objectives"
+  },
+  {
+    "objectID": "projectproposal.html#main-features",
+    "href": "projectproposal.html#main-features",
+    "title": "Project Proposal",
+    "section": "4. Main Features",
+    "text": "4. Main Features"
+  },
+  {
+    "objectID": "projectproposal.html#data-source",
+    "href": "projectproposal.html#data-source",
+    "title": "Project Proposal",
+    "section": "5. Data Source",
+    "text": "5. Data Source"
+  },
+  {
+    "objectID": "projectproposal.html#literature-review",
+    "href": "projectproposal.html#literature-review",
+    "title": "Project Proposal",
+    "section": "6. Literature Review",
+    "text": "6. Literature Review"
+  },
+  {
+    "objectID": "projectproposal.html#comparison-to-existing-applications",
+    "href": "projectproposal.html#comparison-to-existing-applications",
+    "title": "Project Proposal",
+    "section": "7. Comparison to Existing Applications",
+    "text": "7. Comparison to Existing Applications"
+  },
+  {
+    "objectID": "projectproposal.html#ui-prototype",
+    "href": "projectproposal.html#ui-prototype",
+    "title": "Project Proposal",
+    "section": "8. UI Prototype",
+    "text": "8. UI Prototype\n\n1 - EDA2 - KDE3 - Spatial Cluster4 - Spatiotemporal"
+  },
+  {
+    "objectID": "projectproposal.html#application-architecture",
+    "href": "projectproposal.html#application-architecture",
+    "title": "Project Proposal",
+    "section": "9. Application Architecture",
+    "text": "9. Application Architecture"
+  },
+  {
+    "objectID": "projectproposal.html#timeline",
+    "href": "projectproposal.html#timeline",
+    "title": "Project Proposal",
+    "section": "10. Timeline",
+    "text": "10. Timeline"
   }
 ]
