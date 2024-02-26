@@ -49,6 +49,6 @@ editor: visual
 
 ## **9. Application Architecture**
 
-![](images/balls-Page-3.drawio-08.png)
+![](images/architecturaldiagram-01.png)
 
 ## **10. Timeline**
