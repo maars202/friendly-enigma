@@ -30,21 +30,27 @@ editor: visual
 ## **8. UI Prototype**
 
 ::: panel-tabset
-#### 1 - EDA
+#### 1 - Homepage
 
-![](images/balls-Page-3.drawio.png)
+![](images/Screenshot 2024-03-01 at 1.02.03 PM.png)
 
-#### 2 - KDE
+#### 2 - EDA
 
-![](images/balls-Page-3.drawio-02.png)\
+![](images/Screenshot 2024-03-01 at 1.02.18 PM.png)\
 
-#### 3 - Spatial Cluster
+#### 3 - Spatial Analysis
 
-![](images/balls-Page-3.drawio-05.png)
+![](images/Screenshot 2024-03-01 at 1.02.32 PM.png)
 
-#### 4 - Spatiotemporal
+![](images/Screenshot 2024-03-01 at 1.03.40 PM.png)
 
-![](images/balls-Page-3.drawio-04.png)
+#### 4 - Hotspot & Coldspot Area Analysis
+
+![](images/Screenshot 2024-03-01 at 1.04.27 PM.png)
+
+#### 5 - Prediction (Regression)
+
+![](images/Screenshot 2024-03-01 at 1.04.55 PM.png)
 :::
 
 ## **9. Application Architecture**
@@ -52,3 +58,5 @@ editor: visual
 ![](images/architecturaldiagram-01.png)
 
 ## **10. Timeline**
+
+![](images/IS415 timeline.png)
