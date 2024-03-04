@@ -4,4 +4,4 @@ title: "Happy Hideouts"
 
 This is a Quarto website for our group project on helping exchange students and foreigners find convenient airbnb spots in Singapore.
 
-To learn more about our idea please visit the proposal page at <https://serene-piroshki-875112.netlify.app/projectproposal>.
+To learn more about our idea please visit the proposal page at <https://happy-hideouts.netlify.app/projectproposal>.
