@@ -4,7 +4,7 @@
     "href": "index.html",
     "title": "Happy Hideouts",
     "section": "",
-    "text": "This is a Quarto website for our group project on helping exchange students and foreigners find convenient airbnb spots in Singapore.\nTo learn more about our idea please visit the proposal page at https://happy-hideouts.netlify.app/projectproposal."
+    "text": "This is a Quarto website for our group project on helping exchange students and foreigners find convenient airbnb spots in Singapore.\nTo learn more about our idea please visit the proposal page at https://happy-hideouts.netlify.app/projectproposal.\nThe shiny app can be found on https://geospatialanalytics21.shinyapps.io/shinyapp/."
   },
   {
     "objectID": "about.html",
@@ -96,5 +96,40 @@
     "title": "Project Proposal",
     "section": "9. Timeline",
     "text": "9. Timeline"
+  },
+  {
+    "objectID": "eda/eda_basic.html",
+    "href": "eda/eda_basic.html",
+    "title": "Project Proposal",
+    "section": "",
+    "text": "Import and read data\nCleaning data to fill in NA values with imputed data\nVisualising the existing data\nSaving cleaned data for future use"
+  },
+  {
+    "objectID": "eda/eda_basic.html#problem-motivation",
+    "href": "eda/eda_basic.html#problem-motivation",
+    "title": "Project Proposal",
+    "section": "",
+    "text": "The residential rental market in Singapore is a very complex market with many variables that can affect a rental price of a property. For example, according to property guru a HDB rental rate per month can range from $2000 dollars to $4200 dollars depending on location and the type of unit. Factoring private property into the equation will only widen the range in rental rates per month and further complicate the rental decision of prospective tenants. This has sparked our interest as many of our foreign exchange peers have pointed out that they have encountered trouble navigating the complex residential rental market in Singapore.  \nTo simplify the residential rental market in Singapore, our aim is to create an interactive web application that would allow prospective tenants to carry out analysis of different Airbnb listings simply through interacting with the user interface. This would allow prospective tenants to view Airbnb listings on the map simply by specifying type of listings and regions that they are interested in. Additionally, they would also be able to get an estimate of the price of a listing that they are interested in through geospatial weighted regression."
+  },
+  {
+    "objectID": "eda/eda_basic.html#analysis-objectives",
+    "href": "eda/eda_basic.html#analysis-objectives",
+    "title": "Project Proposal",
+    "section": "",
+    "text": "Import and read data\nCleaning data to fill in NA values with imputed data\nVisualising the existing data\nSaving cleaned data for future use"
+  },
+  {
+    "objectID": "eda/eda_basic.html#analysis",
+    "href": "eda/eda_basic.html#analysis",
+    "title": "Project Proposal",
+    "section": "2. Analysis",
+    "text": "2. Analysis\n\n\nShow the code\nfolderToSave = \"/Users/maarunipandithurai/Documents/maars202/geospatial/IS415-GAA/data/rds\""
+  },
+  {
+    "objectID": "eda/eda_basic.html#saving-data-for-future-usage",
+    "href": "eda/eda_basic.html#saving-data-for-future-usage",
+    "title": "Project Proposal",
+    "section": "3. Saving Data for Future Usage",
+    "text": "3. Saving Data for Future Usage\n\n\nShow the code\nfilepath &lt;- str_interp(\"${folderToSave}/dengue_df\")\nwrite_rds(dengue_df_filtered, filepath) \n\n\n\n\nShow the code\nfilepath &lt;- str_interp(\"${folderToSave}/dengue_df\")\ndengue_df &lt;- read_rds(filepath, refhook = NULL)\nhead(dengue_df)"
   }
 ]

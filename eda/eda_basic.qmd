@@ -1,0 +1,42 @@
+---
+title: "Project Proposal"
+format: 
+  html: 
+    code-fold: true
+    code-summary: "Show the code"
+    toc: true
+    toc-depth: 4
+execute: 
+  warning: false
+  eval: false
+  echo: true
+editor: visual
+---
+
+## 1. Analysis Objectives
+
+1.  Import and read data
+2.  Cleaning data to fill in NA values with imputed data
+3.  Visualising the existing data
+4.  Saving cleaned data for future use
+
+## 2. Analysis
+
+```{r}
+folderToSave = "/Users/maarunipandithurai/Documents/maars202/geospatial/IS415-GAA/data/rds"
+```
+
+## 3. Saving Data for Future Usage
+
+```{r}
+#| eval: false
+filepath <- str_interp("${folderToSave}/dengue_df")
+write_rds(dengue_df_filtered, filepath) 
+```
+
+```{r}
+#| eval: false
+filepath <- str_interp("${folderToSave}/dengue_df")
+dengue_df <- read_rds(filepath, refhook = NULL)
+head(dengue_df) 
+```

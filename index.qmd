@@ -5,3 +5,5 @@ title: "Happy Hideouts"
 This is a Quarto website for our group project on helping exchange students and foreigners find convenient airbnb spots in Singapore.
 
 To learn more about our idea please visit the proposal page at <https://happy-hideouts.netlify.app/projectproposal>.
+
+The shiny app can be found on <https://geospatialanalytics21.shinyapps.io/shinyapp/>.

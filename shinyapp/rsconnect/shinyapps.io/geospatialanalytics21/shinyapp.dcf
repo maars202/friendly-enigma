@@ -1,0 +1,12 @@
+name: shinyapp
+title: shinyapp
+username: geospatialanalytics21
+account: geospatialanalytics21
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 11391256
+bundleId: 8324524
+url: https://geospatialanalytics21.shinyapps.io/shinyapp/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
