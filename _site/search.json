@@ -4,7 +4,7 @@
     "href": "index.html",
     "title": "Happy Hideouts",
     "section": "",
-    "text": "This is a Quarto website for our group project on helping exchange students and foreigners find convenient airbnb spots in Singapore.\nTo learn more about our idea please visit the proposal page at https://happy-hideouts.netlify.app/projectproposal.\nThe shiny app can be found on https://geospatialanalytics21.shinyapps.io/shinyapp/."
+    "text": "This is a Quarto website for our group project on helping exchange students and foreigners find convenient airbnb spots in Singapore.\n\nTo learn more about our idea please visit the proposal page at https://happy-hideouts.netlify.app/projectproposal.\nThe shiny app can be found on https://geospatialanalytics21.shinyapps.io/shinyapp/."
   },
   {
     "objectID": "about.html",
@@ -123,13 +123,13 @@
     "href": "eda/eda_basic.html#analysis",
     "title": "Project Proposal",
     "section": "2. Analysis",
-    "text": "2. Analysis\n\n\nShow the code\nfolderToSave = \"/Users/maarunipandithurai/Documents/maars202/geospatial/IS415-GAA/data/rds\""
+    "text": "2. Analysis\n\n\nCode\nfolderToSave = \"/Users/maarunipandithurai/Documents/maars202/geospatial/IS415-GAA/data/rds\""
   },
   {
     "objectID": "eda/eda_basic.html#saving-data-for-future-usage",
     "href": "eda/eda_basic.html#saving-data-for-future-usage",
     "title": "Project Proposal",
     "section": "3. Saving Data for Future Usage",
-    "text": "3. Saving Data for Future Usage\n\n\nShow the code\nfilepath &lt;- str_interp(\"${folderToSave}/dengue_df\")\nwrite_rds(dengue_df_filtered, filepath) \n\n\n\n\nShow the code\nfilepath &lt;- str_interp(\"${folderToSave}/dengue_df\")\ndengue_df &lt;- read_rds(filepath, refhook = NULL)\nhead(dengue_df)"
+    "text": "3. Saving Data for Future Usage\n\n\nCode\nfilepath &lt;- str_interp(\"${folderToSave}/dengue_df\")\nwrite_rds(dengue_df_filtered, filepath) \n\n\n\n\nCode\nfilepath &lt;- str_interp(\"${folderToSave}/dengue_df\")\ndengue_df &lt;- read_rds(filepath, refhook = NULL)\nhead(dengue_df)"
   }
 ]
