@@ -21,11 +21,11 @@ To simplify the residential rental market in Singapore, our aim is to create an 
 
 ## 2. Project Objectives
 
-1.  Conduct exploratory data analysis and plot a map of Airbnb listings in Singapore to gain an understanding of where Airbnb listings in Singapore are located. (Maaruni)
+1.  Conduct exploratory data analysis and plot a map of Airbnb listings in Singapore to gain an understanding of where Airbnb listings in Singapore are located. 
 2.  Conduct first-order spatial point pattern analysis: Deriving Kernel Density Estimation layer for visualizing and exploring the intensity of Airbnb listings in Singapore. (Felicia)
 3.  Conduct second-order spatial point pattern analysis: Analyse Spatial point processes using appropriate G, F, K and L functions. Performing Complete Spatial Randomness test using Monte Carlo simulations to confirm the observed spatial patterns.   (Felicia)
 4.  Conduct Local Measures of Spatial Autocorrelation: Using local Moran’s or local Geary’s C statistical method to detect Spatial Custers and outliers. (Jin Lei)
-5.  Conduct Geographically Weighted Regression: Building Multiple Linear Regression model and Hedonic Pricing model to predict prices of Airbnb listings. In this case, price will be our response variable and the set of predictors that we will use in our predictive model includes: (Jin Lei)
+5.  Conduct Geographically Weighted Regression: Building Multiple Linear Regression model and Hedonic Pricing model to predict prices of Airbnb listings. In this case, price will be our response variable and the set of predictors that we will use in our predictive model includes: (Maaruni)
     -   Neighbourhood,
     -   room_type,
     -   minimum nights,
