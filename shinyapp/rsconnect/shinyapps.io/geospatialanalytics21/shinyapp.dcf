@@ -5,7 +5,7 @@ account: geospatialanalytics21
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 11391256
-bundleId: 8446355
+bundleId: 8446505
 url: https://geospatialanalytics21.shinyapps.io/shinyapp/
 version: 1
 asMultiple: FALSE

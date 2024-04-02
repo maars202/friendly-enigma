@@ -158,14 +158,30 @@ ui <- fluidPage(
                                     )
                       )),
              
+             tabPanel("Data Analytics", value="data_analytics", fluid=TRUE,
+                      sidebarLayout(
+                        sidebarPanel(
+                          selectInput("analytics_option", "Choose Analytics Option",
+                                      choices = c("Room types by region",
+                                                  "Pricing of Room Types",
+                                                  "Room Types by Price and Region",
+                                                  "Host per year",
+                                                  "Listing with no review",
+                                                  "Review score by room type"))
+                        ),
+                        mainPanel(
+                          uiOutput("analytics_visualization"),
+                        )
+                      )
+             ),
              tabPanel("Second order analysis: K-Function test by sub regions", value="k_function", fluid=TRUE,
                       sidebarLayout(
                         sidebarPanel(
                           selectInput("Region", "Region", choices = c("East Region", "West Region", "North Region", "NorthEast Region", "Central Region"))
                         ),
                         mainPanel(
-                          textOutput("k_function_result"),
-                          uiOutput("k_function_image")
+                          uiOutput("k_function_image"),
+                          textOutput("k_function_result")
                         )
                       )
              ),
@@ -176,8 +192,8 @@ ui <- fluidPage(
                           selectInput("RoomType", "Room Type", choices = c("Hotel Rooms", "Shared Rooms", "Private Rooms", "Entire Home Apartments"))
                         ),
                         mainPanel(
-                          textOutput("k_test_fft_result"),
-                          uiOutput("k_test_fft_image")
+                          uiOutput("k_test_fft_image"),
+                          textOutput("k_test_fft_result")
                         )
                       )
              ),
@@ -188,8 +204,8 @@ ui <- fluidPage(
                           selectInput("RoomType_kde", "Room Type", choices = c("Private Rooms", "Entire Homes/Apartments", "Shared Rooms", "Hotel Rooms"))
                         ),
                         mainPanel(
-                          textOutput("kde_result"),
-                          uiOutput("kde_image")
+                          uiOutput("kde_image"),
+                          textOutput("kde_result")
                         )
                       )
              )
@@ -206,6 +222,7 @@ server <- function(input, output) {
     "MSOA"="MSOA"
   )
   
+  
   output$distPlot <- renderPlot({
     # generate bins based on input$bins from ui.R
     x    <- faithful[, 2]
@@ -216,6 +233,27 @@ server <- function(input, output) {
          xlab = 'Waiting time to next eruption (in mins)',
          main = 'Histogram of waiting times')
   })
+  
+  output$analytics_visualization <- renderUI({
+    analytics_option <- input$analytics_option
+    
+    if (analytics_option == "Room types by region") {
+      img_path <- "room_types_region.png"
+    } else if (analytics_option == "Pricing of Room Types") {
+      img_path <- "pricing_room_types.png"
+    } else if (analytics_option == "Room Types by Price and Region") {
+      img_path <- "room_types_price_region.png"
+    } else if (analytics_option == "Host per year") {
+      img_path <- "host_per_year.png"
+    } else if (analytics_option == "Listing with no review") {
+      img_path <- "listing_no_review.png"
+    } else if (analytics_option == "Review score by room type") {
+      img_path <- "review_score_room_type.png"
+    }
+    
+    tags$img(src = img_path, height=400, width=600)
+  })
+
   
   output$k_function_result <- renderText({
     region <- input$Region
@@ -288,7 +326,7 @@ server <- function(input, output) {
     } else if (room_type == "Private Rooms") {
       img_path <- "private_rooms.png"
     } else if (room_type == "Entire Home Apartments") {
-      img_path <- "shared_rooms.png"
+      img_path <- "entire_home.png"
     }
     tags$img(src = img_path, height=400, width=800)
   })
