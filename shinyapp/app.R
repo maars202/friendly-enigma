@@ -265,47 +265,47 @@ server <- function(input, output) {
     # UI logic to render image based on selected region
     region <- input$Region
     if (region == "East Region") {
-      img_path <- "image/second_east.png"
+      img_path <- "second_east.png"
     } else if (region == "West Region") {
-      img_path <- "image/second_west.png"
+      img_path <- "second_west.png"
     } else if (region == "North Region") {
-      img_path <- "image/second_north.png"
+      img_path <- "second_north.png"
     } else if (region == "NorthEast Region") {
-      img_path <- "image/second_ne.png"
+      img_path <- "second_ne.png"
     } else if (region == "Central Region") {
-      img_path <- "image/second_central.png"
+      img_path <- "second_central.png"
     }
-    tags$img(src = img_path)
+    tags$img(src = img_path, height=500, width=500)
   })
   
   output$k_test_fft_image <- renderUI({
     # UI logic to render image based on selected room type
     room_type <- input$RoomType
     if (room_type == "Hotel Rooms") {
-      img_path <- "image/hotel.png"
+      img_path <- "hotel.png"
     } else if (room_type == "Shared Rooms") {
-      img_path <- "image/shared_rooms.png"
+      img_path <- "shared_rooms.png"
     } else if (room_type == "Private Rooms") {
-      img_path <- "image/private_rooms.png"
+      img_path <- "private_rooms.png"
     } else if (room_type == "Entire Home Apartments") {
       img_path <- "shared_rooms.png"
     }
-    tags$img(src = img_path)
+    tags$img(src = img_path, height=400, width=800)
   })
   
   output$kde_image <- renderUI({
     # UI logic to render image based on selected room type for KDE
     room_type <- input$RoomType_kde
     if (room_type == "Private Rooms") {
-      img_path <- "image/kde_private.png"
+      img_path <- "kde_private.jpg"
     } else if (room_type == "Entire Homes/Apartments") {
-      img_path <- "image/kde_entire.png"
+      img_path <- "kde_entire.png"
     } else if (room_type == "Shared Rooms") {
-      img_path <- "image/kde_shared.jpg"
+      img_path <- "kde_shared.jpg"
     } else if (room_type == "Hotel Rooms") {
-      img_path <- "image/kde_hotel.jpg"
+      img_path <- "kde_hotel.jpg"
     }
-    tags$img(src = img_path)
+    tags$img(src = img_path, height=400, width=600)
   })
 }
 
