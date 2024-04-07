@@ -27,6 +27,8 @@ library(DT)
 library(shinyWidgets)
 library(RColorBrewer)
 
+# -----Load data files
+#load("data/ladbbox.rda")
 
 # Define UI for application that draws a histogram
 # Define varGwrLod
@@ -36,6 +38,47 @@ varGwrLod <- c(
   "MSOA"="MSOA"
 )
 
+depVariables = c(
+  "price"="price",
+  "minimum_nights"="minimum_nights",
+  "minimum_nights2"="minimum_nights2"
+)
+expVariables = c("price"="price",
+                 "minimum_nights"="minimum_nights",
+                 "minimum_nights2"="minimum_nights2")
+
+
+kernelMethods = c("Gaussian"="Gaussian",
+                  "Exponential"="exponential",
+                  "Bisquare"="bisquare",
+                  "Tricube"="tricube",
+                  "Boxcar"="boxcar")
+
+# GWR Approach
+varGwrApproach <- c(
+  "CV"="CV",
+  "AIC"="AIC"
+)
+
+# GWR Bandwidth
+varGwrBandwidth <- c(
+  "Fixed"=FALSE,
+  "Adaptive"=TRUE
+)
+
+# GWR AutoBandwidth
+varGwrAutoBandwidth <- c(
+  "Manual"=FALSE,
+  "Auto"=TRUE
+)
+
+# GWR Distance
+varGwrDistance <- c(
+  "Euclidean"=2,
+  "Manhattan"=1
+)
+
+
 # Define UI for application that draws a histogram
 ui <- fluidPage(
   
@@ -44,6 +87,7 @@ ui <- fluidPage(
   
   # -----Navigation Bar
   navbarPage("SGSAS", fluid=TRUE, windowTitle="Simple Geo-Spatial Analysis using R and Shiny ", selected="eda",
+             #START OF GWR PART1
              tabPanel("GWR", value="gwr", fluid=TRUE, icon=icon("laptop-code"),
                       sidebarLayout(position="left", fluid=TRUE,
                                     sidebarPanel(width=3, fluid=TRUE,
@@ -56,107 +100,142 @@ ui <- fluidPage(
                                                                         selected="LAD",
                                                                         multiple=FALSE,
                                                                         width="97%"
-                                                            ))))),
+                                                            )),
+                                                          fluidRow(       
+                                                            selectInput(inputId="DependentVariable",
+                                                                        label="Dependent Variable",
+                                                                        choices=depVariables,
+                                                                        selected="price",
+                                                                        multiple=FALSE,
+                                                                        width="97%"
+                                                            )),
+                                                          fluidRow(       
+                                                            selectInput(inputId="ExplanatoryVariable",
+                                                                        label="Explanatory Variable",
+                                                                        choices=expVariables,
+                                                                        selected="minimum_nights",
+                                                                        multiple=TRUE,
+                                                                        width="97%"
+                                                            )),
+                                                          fluidRow(       
+                                                            selectInput(inputId="KernelMethod",
+                                                                        label="Kernel Method",
+                                                                        choices=kernelMethods,
+                                                                        selected="Gaussian",
+                                                                        multiple=FALSE,
+                                                                        width="97%"
+                                                            )),
+                                                          fluidRow(
+                                                            column(5,
+                                                                   radioButtons(inputId="GwrApproach",
+                                                                                label="Approach",
+                                                                                choices=varGwrApproach,
+                                                                                selected="CV",
+                                                                                inline=FALSE,
+                                                                                width="100%"
+                                                                   ),
+                                                                   checkboxInput(inputId="GwrBandwidth",
+                                                                                 label="Adaptive",
+                                                                                 value=TRUE,
+                                                                                 width="100%"
+                                                                   )
+                                                            ),
+                                                            column(7,
+                                                                   radioButtons(inputId="GwrDistance",
+                                                                                label="Distance",
+                                                                                choices=varGwrDistance,
+                                                                                selected=2,
+                                                                                inline=FALSE,
+                                                                                width="100%"
+                                                                   ),
+                                                                   checkboxInput(inputId="GwrAutoBandwidth",
+                                                                                 label="Auto Bandwidth",
+                                                                                 value=TRUE,
+                                                                                 width="100%"
+                                                                   ))),
+                                                          
+                                                          fluidRow(
+                                                            conditionalPanel(condition="input.GwrAutoBandwidth==0",
+                                                                             numericInput(inputId="ManualBandwidth",
+                                                                                          label="Specify Bandwidth",
+                                                                                          min=5,
+                                                                                          max=9999,
+                                                                                          value=20,
+                                                                                          width="75px"
+                                                                             )
+                                                            ),
+                                                            checkboxInput(inputId="GwrShowSummary",
+                                                                          label="Summary",
+                                                                          value=FALSE,
+                                                                          width="100%"
+                                                            )
+                                                          )
+                                                          ))),
                                     mainPanel(width=9, fluid=TRUE,
                                               fluidRow(
+                                                # column(6,
+                                                #        leafletOutput("gwr1"),
+                                                #        column(6,
+                                                #               selectInput(inputId="Gwr1Reference",
+                                                #                           label="Reference Value",
+                                                #                           choices=c("Local R2"="Local_R2"
+                                                #                           ),
+                                                #                           selected=NULL,
+                                                #                           multiple=FALSE,
+                                                #                           width="100%"
+                                                #               )),
+                                                #        column(6,
+                                                #               selectInput(inputId="Gwr1Binning",
+                                                #                           label="Binning Method",
+                                                #                           choices=c("Std Deviation"="sd",
+                                                #                                     "Equal"="equal",
+                                                #                                     "Pretty"="pretty",
+                                                #                                     "Quantile"="quantile",
+                                                #                                     "K-means Cluster"="kmeans",
+                                                #                                     "Hierarchical Cluster"="hclust",
+                                                #                                     "Bagged Cluster"="bclust",
+                                                #                                     "Fisher"="fisher",
+                                                #                                     "Jenks"="jenks",
+                                                #                                     "Log10 Pretty"="log10_pretty"
+                                                #                           ),
+                                                #                           selected="quantile",
+                                                #                           multiple=FALSE,
+                                                #                           width="100%"
+                                                #               )),
+                                                #        sliderInput(inputId="Gwr1N",
+                                                #                    label="Select number of classes",
+                                                #                    min=2,
+                                                #                    max=30,
+                                                #                    value=5,
+                                                #                    width="100%"
+                                                #        )
+                                                # ),
+                                                
+                                                # {if (TRUE) {column(6,
+                                                #        leafletOutput("gwr9")),
+                                                # 
+                                                # column(6,
+                                                #        leafletOutput("gwr8"))} else {column(12,
+                                                #                                           leafletOutput("gwr9"))}},
+                                                
                                                 column(6,
-                                                       leafletOutput("gwr1"),
-                                                       column(6,
-                                                              selectInput(inputId="Gwr1Reference",
-                                                                          label="Reference Value",
-                                                                          choices=c("Local R2"="Local_R2"
-                                                                          ),
-                                                                          selected=NULL,
-                                                                          multiple=FALSE,
-                                                                          width="100%"
-                                                              )),
-                                                       column(6,
-                                                              selectInput(inputId="Gwr1Binning",
-                                                                          label="Binning Method",
-                                                                          choices=c("Std Deviation"="sd",
-                                                                                    "Equal"="equal",
-                                                                                    "Pretty"="pretty",
-                                                                                    "Quantile"="quantile",
-                                                                                    "K-means Cluster"="kmeans",
-                                                                                    "Hierarchical Cluster"="hclust",
-                                                                                    "Bagged Cluster"="bclust",
-                                                                                    "Fisher"="fisher",
-                                                                                    "Jenks"="jenks",
-                                                                                    "Log10 Pretty"="log10_pretty"
-                                                                          ),
-                                                                          selected="quantile",
-                                                                          multiple=FALSE,
-                                                                          width="100%"
-                                                              )),
-                                                       sliderInput(inputId="Gwr1N",
-                                                                   label="Select number of classes",
-                                                                   min=2,
-                                                                   max=30,
-                                                                   value=5,
-                                                                   width="100%"
-                                                       )
-                                                ),
+                                                       leafletOutput("gwr9")),
+                                                
                                                 column(6,
-                                                       leafletOutput("gwr2"),
-                                                       column(4,
-                                                              HTML(
-                                                                '<div class="info-box-content" style="font-weight: lighter; font-size: smaller">
-                                                <span class="info-box-text">GWR Adj R2: </span>
-                                                <span class="info-box-number">
-                                                  <div id="showGwrR2" class="shiny-text-output" style="font-weight: bolder; font-size: larger"></div>
-                                                </span>
-                                                </div>'
-                                                              ),
-                                                              HTML(
-                                                                '<div class="info-box-content" style="font-weight: lighter; font-size: smaller">
-                                                <span class="info-box-text">LM Adj R2: </span>
-                                                <span class="info-box-number">
-                                                  <div id="showLmR2" class="shiny-text-output" style="font-weight: bolder; font-size: larger"></div>
-                                                </span>
-                                                </div>'
-                                                              )),
-                                                       column(4,
-                                                              HTML(
-                                                                '<div class="info-box-content" style="font-weight: lighter; font-size: smaller">
-                                                <span class="info-box-text">GWR AICc: </span>
-                                                <span class="info-box-number">
-                                                  <div id="showGwrAic" class="shiny-text-output" style="font-weight: bolder; font-size: larger"></div>
-                                                </span>
-                                                </div>'
-                                                              ),
-                                                              HTML(
-                                                                '<div class="info-box-content" style="font-weight: lighter; font-size: smaller">
-                                                <span class="info-box-text">LM AICc: </span>
-                                                <span class="info-box-number">
-                                                  <div id="showLmAic" class="shiny-text-output" style="font-weight: bolder; font-size: larger"></div>
-                                                </span>
-                                                </div>'
-                                                              )),
-                                                       column(4,
-                                                              HTML(
-                                                                '<div class="info-box-content" style="font-weight: lighter; font-size: smaller">
-                                                <span class="info-box-text">Bandwidth: </span>
-                                                <span class="info-box-number">
-                                                  <div id="showGwrBw" class="shiny-text-output" style="font-weight: bolder; font-size: larger"></div>
-                                                </span>
-                                                </div>'
-                                                              ),
-                                                              HTML(
-                                                                '<div class="info-box-content" style="font-weight: lighter; font-size: smaller">
-                                                <span class="info-box-text">Data Points: </span>
-                                                <span class="info-box-number">
-                                                  <div id="showGwrDp" class="shiny-text-output" style="font-weight: bolder; font-size: larger"></div>
-                                                </span>
-                                                </div>'
-                                                              ))
-                                                )
+                                                       leafletOutput("gwr8")),
+                                                
+                                                
+                                                
                                               ),
                                               conditionalPanel(condition="input.GwrShowSummary==1",
                                                                verbatimTextOutput(outputId="GwrSummary")
                                               )
                                               
                                     )
+                      
                       )),
+             
+             #END OF GWR PART1
              
              tabPanel("Data Analytics", value="data_analytics", fluid=TRUE,
                       sidebarLayout(
@@ -213,7 +292,10 @@ ui <- fluidPage(
   )
 )
 
-server <- function(input, output) {
+server <- function(input, output, session) {
+  
+  # -----All Global functions, variables here
+  rv <- reactiveValues()
   
   # Define varGwrLod
   varGwrLod <- c(
@@ -345,7 +427,353 @@ server <- function(input, output) {
     }
     tags$img(src = img_path, height=400, width=600)
   })
+
+
+
+
+#START OF GWR PART2
+
+
+# -----GWR functions
+observe({
+  rv$variableSelect <- input$GwrX
+  updateSelectInput(session, inputId="Gwr1Reference",
+                    label="Reference Value",
+                    choices=c("Local R2"="Local_R2",rv$variableSelect)
+  )
+})
+
+
+output$gwr1 <- renderLeaflet({
+  
+  
+  if (input$GwrLod=="LAD") {
+    GwrDataSp <- maplad_sp
+    GwrDataSf <- maplad_sf
+    if (input$Gwr1Reference=="Local_R2"){
+      Gwr1Title <- "Local R2"
+    }
+    else {
+      Gwr1Title <- "Coefficients"
+    }
+  }
+  else if (input$GwrLod=="Ward") {
+    if (input$GwrY=="estimated_diabetes_prevalence") {
+      GwrDataSp <- mapward_sp[mapward_sp@data$estimated_diabetes_prevalence!=0,]
+      GwrDataSf <- mapward_sf[mapward_sf$estimated_diabetes_prevalence!=0,]
+    }
+    else {
+      GwrDataSp <- mapward_sp
+      GwrDataSf <- mapward_sf
+    }
+    if (input$Gwr1Reference=="Local_R2"){
+      Gwr1Title <- "Local R2"
+    }
+    else {
+      Gwr1Title <- "Coefficients"
+    }
+  }
+  else {
+    GwrDataSp <- mapmsoa_sp
+    GwrDataSf <- mapmsoa_sf
+    if (input$Gwr1Reference=="Local_R2"){
+      Gwr1Title <- "Local R2"
+    }
+    else {
+      Gwr1Title <- "Coefficients"
+    }
+  }
+  
+  if (input$GwrLad=="All"){
+    rv$subsetGwrView <- maprgn_sf[,"area_nm"]
+  }
+  else {
+    rv$subsetGwrView <- maplad_sf[maplad_sf$area_nm==input$GwrLad,"area_nm"]
+  }
+  
+  
+  GwrFormula <- as.formula(paste(input$GwrY,paste(input$GwrX, collapse="+"), sep="~"))
+  if (input$GwrAutoBandwidth==1) {
+    GwrBw <- bw.gwr(GwrFormula, data=GwrDataSp, approach=input$GwrApproach, kernel=input$GwrKernel, adaptive=input$GwrBandwidth, p=input$GwrDistance, longlat=FALSE)
+  }
+  else {
+    GwrBw <- input$ManualBandwidth
+  }
+  
+  rv$Gwr <- gwr.basic(GwrFormula, data=GwrDataSp, bw=GwrBw, kernel=input$GwrKernel, adaptive=input$GwrBandwidth, p=input$GwrDistance, longlat=FALSE, cv=TRUE)
+  var.n<-length(rv$Gwr$lm$coefficients)
+  dp.n<-length(rv$Gwr$lm$residuals)
+  rv$GwrDiagnostic <- as.data.frame(rv$Gwr$GW.diagnostic) %>%
+    mutate(lm_RSS=sum(rv$Gwr$lm$residuals^2)) %>%
+    mutate(lm_AIC=dp.n*log(lm_RSS/dp.n)+dp.n*log(2*pi)+dp.n+2*(var.n + 1)) %>%
+    mutate(lm_AICc=dp.n*log(lm_RSS/dp.n)+dp.n*log(2*pi)+dp.n+2*dp.n*(var.n+1)/(dp.n-var.n-2)) %>%
+    mutate(lm_R2=summary(rv$Gwr$lm)$r.squared) %>%
+    mutate(lm_R2.adj=summary(rv$Gwr$lm)$adj.r.squared) %>%
+    mutate(bw=rv$Gwr$GW.arguments$bw) %>%
+    mutate(dp.n=dp.n)
+  GwrSDF <- as.data.frame(rv$Gwr$SDF)
+  for (dim_ in rv$variableSelect) {
+    # GwrSDF[, paste0(dim_, "_PV")] <- pt(abs(GwrSDF[, paste0(dim_, "_TV")]),df=length(GwrSDF)-1,lower.tail=FALSE)*2
+    GwrSDF[, paste0(dim_, "_PV")] <- pt(abs(GwrSDF[, paste0(dim_, "_TV")]),df=rv$GwrDiagnostic$enp,lower.tail=FALSE)*2
+  }
+  
+  rv$GwrResult <- GwrDataSf %>%
+    select(area_id,area_nm,lad_id,lad_nm,geometry) %>%
+    cbind(., as.matrix(GwrSDF))
+  
+  gwr1Plot <- tm_shape(rv$GwrResult) +
+    tm_fill(input$Gwr1Reference,
+            title=Gwr1Title,
+            style=input$Gwr1Binning,
+            n=input$Gwr1N,
+            breaks=c(0,0.001,0.01,0.05,0.1,1),
+            palette="RdBu",
+            midpoint=0,
+            id="area_nm",
+            alpha=0.8,
+            legend.format=list(digits=3)
+    ) +
+    tm_borders(alpha=0.8
+    ) +
+    tm_view(view.legend.position=c("right","top"),
+            control.position=c("left","bottom"),
+            colorNA="Black"
+    ) +
+    tmap_options(basemaps=c("Esri.WorldGrayCanvas","Stamen.TonerLite","OpenStreetMap"),
+                 basemaps.alpha=c(0.8,0.5,0.7)
+    ) +
+    tm_shape(rv$subsetGwrView) +
+    tm_borders(col="black",
+               lwd=3)
+  tmap_leaflet(gwr1Plot, in.shiny=TRUE)
+  
+})
+
+
+output$gwr2 <- renderLeaflet({
+  
+  
+  if (input$Gwr1Reference=="Local_R2") {
+    gwr2Plot_old <- tm_shape(rv$GwrResult) +
+      tm_fill("residual",
+              title="Residual",
+              style="sd",
+              # n=6,
+              # breaks=c(-1,-0.999,0,0.999,1),
+              palette="RdBu",
+              midpoint=0,
+              id="area_nm",
+              alpha=0.8,
+              legend.format=list(digits=3)
+      ) +
+      tm_borders(alpha=0.8
+      ) +
+      tm_view(view.legend.position=c("right","top"),
+              control.position=c("left","bottom"),
+              colorNA="Black"
+      ) +
+      tmap_options(basemaps=c("Esri.WorldGrayCanvas","Stamen.TonerLite","OpenStreetMap"),
+                   basemaps.alpha=c(0.8,0.5,0.7)
+      ) +
+      tm_shape(rv$subsetGwrView) +
+      tm_borders(col="black",
+                 lwd=3)
+    
+    airbnb_resale.sf.adaptive2 = read_rds("./data/airbnb_resale.sf.adaptive.rds")
+    mpsz_svy21_3 = read_rds("./data/mpsz_svy21")
+    gwr2Plot <- tm_shape(mpsz_svy21_3)+
+      tm_polygons(alpha = 0.1) +
+      tm_shape(airbnb_resale.sf.adaptive2) +  
+      tm_dots(col = "Local_R2",
+              border.col = "gray60",
+              border.lwd = 1) +
+      tm_view(set.zoom.limits = c(11,14))
+  }
+  else {
+    GwrPV <- paste0(input$Gwr1Reference, "_PV")
+    gwr2Plot_old <- tm_shape(rv$GwrResult) +
+      tm_fill(GwrPV,
+              title="P-value",
+              style="fixed",
+              n=5,
+              breaks=c(0,0.001,0.01,0.05,0.1,1),
+              palette=colorsNBu,
+              midpoint=0,
+              id="area_nm",
+              alpha=0.8,
+              legend.format=list(digits=3)
+      ) +
+      tm_borders(alpha=0.8
+      ) +
+      tm_view(view.legend.position=c("right","top"),
+              control.position=c("left","bottom"),
+              colorNA="Black"
+      ) +
+      tmap_options(basemaps=c("Esri.WorldGrayCanvas","Stamen.TonerLite","OpenStreetMap"),
+                   basemaps.alpha=c(0.8,0.5,0.7)
+      ) +
+      tm_shape(rv$subsetGwrView) +
+      tm_borders(col="black",
+                 lwd=3)
+    
+    airbnb_resale.sf.adaptive2 = read_rds("/Users/maarunipandithurai/Documents/Documents - Maaruni’s MacBook Pro/maars202/geospatial/gaproject/shinyapp/data/airbnb_resale.sf.adaptive.rds")
+    mpsz_svy21_3 = read_rds("/Users/maarunipandithurai/Documents/Documents - Maaruni’s MacBook Pro/maars202/geospatial/gaproject/shinyapp/data/mpsz_svy21")
+    gwr2Plot <- tm_shape(mpsz_svy21_3)+
+      tm_polygons(alpha = 0.1) +
+      tm_shape(airbnb_resale.sf.adaptive2) +  
+      tm_dots(col = "Local_R2",
+              border.col = "gray60",
+              border.lwd = 1) +
+      tm_view(set.zoom.limits = c(11,14))
+    
+  }
+  
+  tmap_leaflet(gwr2Plot, in.shiny=TRUE)
+  
+  
+})
+
+output$showGwrR2 <- renderText ({
+  as.character(round(rv$GwrDiagnostic$gwR2.adj,digits=7))
+})
+
+output$showGwrAic <- renderText ({
+  as.character(round(rv$GwrDiagnostic$AICc,digits=4))
+})
+
+output$showLmR2 <- renderText ({
+  as.character(round(rv$GwrDiagnostic$lm_R2.adj,digits=7))
+})
+
+output$showLmAic <- renderText ({
+  as.character(round(rv$GwrDiagnostic$lm_AICc,digits=4))
+})
+
+output$showGwrBw <- renderText ({
+  if (input$GwrBandwidth==1) {
+    paste0(as.character(round(rv$GwrDiagnostic$bw,digits=0)), " neighbours")
+  }
+  else {
+    paste0(as.character(round(rv$GwrDiagnostic$bw,digits=0)), " metres")
+  }
+})
+
+output$showGwrDp <- renderText ({
+  as.character(rv$GwrDiagnostic$dp.n)
+})
+
+output$showGwrDp <- renderText ({
+  "hellooooo" + getwd(".")
+})
+
+output$GwrSummary <- renderPrint({
+  rv$Gwr
+})
+
+
+observe({
+  input$GwrLod
+  input$GwrY
+  input$GwrX
+  input$GwrModel
+  input$GwrDistance
+  input$GwrBandwidth
+  input$GwrKernel
+  input$GwrApproach
+  input$GwrAutoBandwidth
+  input$GwrManualBandwidth
+  input$Gwr1Reference
+  input$Gwr1Binning
+  input$Gwr1N
+  #coordsGwr <- ladbbox[ladbbox$area_nm==input$GwrLad,c("xmin","ymin","xmax","ymax")]
+  #if (!is.null(coordsGwr)) {
+    leafletProxy("gwr1") %>%
+      #fitBounds(coordsGwr$xmin, coordsGwr$ymin, coordsGwr$xmax, coordsGwr$ymax)
+      fitBounds(2667.538, 15748.721, 56396.440, 50256.334 )
+    leafletProxy("gwr2") %>%
+      #fitBounds(coordsGwr$xmin, coordsGwr$ymin, coordsGwr$xmax, coordsGwr$ymax)
+      fitBounds(2667.538, 15748.721, 56396.440, 50256.334 )
+  #}
+}, priority=2)
+
+observe({
+  coordsGwr2 <- input$gwr1_bounds
+  #if (!is.null(coordsGwr2)) {
+    leafletProxy("gwr2") %>%
+      #fitBounds(coordsGwr2$west, coordsGwr2$south, coordsGwr2$east, coordsGwr2$north)
+      fitBounds(2667.538, 15748.721, 56396.440, 50256.334 )
+  #}
+}, priority=1)
+
+
+
+#start of example 
+points <- eventReactive(input$recalc, {
+  cbind(rnorm(40) * 2 + 13, rnorm(40) + 48)
+}, ignoreNULL = FALSE)
+
+output$gwr7 <- renderLeaflet({
+  leaflet() %>%
+    addProviderTiles(providers$Stadia.StamenTonerLite,
+                     options = providerTileOptions(noWrap = TRUE)
+    ) %>%
+    addMarkers(data = points())
+})
+#end of example 
+
+airbnb_resale.sf.adaptive2 = read_rds("/Users/maarunipandithurai/Documents/Documents - Maaruni’s MacBook Pro/maars202/geospatial/gaproject/shinyapp/data/airbnb_resale.sf.adaptive.rds")
+mpsz_svy21_3 = read_rds("/Users/maarunipandithurai/Documents/Documents - Maaruni’s MacBook Pro/maars202/geospatial/gaproject/shinyapp/data/mpsz_svy21")
+coefficientEstimatesPlot = TRUE
+
+gwr1Plot = NULL
+
+if (coefficientEstimatesPlot == FALSE){gwr2Plot <- tm_shape(mpsz_svy21_3)+
+  tm_polygons(alpha = 0.1) +
+  tm_shape(airbnb_resale.sf.adaptive2) +  
+  tm_dots(col = "Local_R2",
+          border.col = "gray60",
+          border.lwd = 1) +
+  tm_view(set.zoom.limits = c(11,14))
+}else{
+  # sf_use_s2(TRUE)
+  tmap_mode("view")
+  number_of_reviews_SE <- tm_shape(mpsz_svy21_3)+
+    tm_polygons(alpha = 0.1) +
+    tm_shape(airbnb_resale.sf.adaptive2) +  
+    tm_dots(col = "number_of_reviews_SE",
+            border.col = "gray60",
+            border.lwd = 1) +
+    tm_view(set.zoom.limits = c(11,14))
+  
+  number_of_reviews_TV <- tm_shape(mpsz_svy21_3)+
+    tm_polygons(alpha = 0.1) +
+    tm_shape(airbnb_resale.sf.adaptive2) +  
+    tm_dots(col = "number_of_reviews_TV",
+            size = 0.15,
+            border.col = "gray60",
+            border.lwd = 1, palette = "YlGn") +
+    tm_view(set.zoom.limits = c(11,14)) 
+  gwr1Plot = number_of_reviews_SE
+  gwr2Plot = number_of_reviews_TV
+  # gwr2Plot = tmap_arrange(number_of_reviews_SE, number_of_reviews_TV,  asp=1, ncol=2, sync = TRUE)
 }
+
+output$gwr9 <- renderLeaflet({
+  tmap_options(check.and.fix = TRUE)
+  tmap_leaflet(gwr2Plot, in.shiny=TRUE)})
+
+if (!is.null(gwr1Plot)){
+output$gwr8 <- renderLeaflet({
+  tmap_options(check.and.fix = TRUE)
+  tmap_leaflet(gwr1Plot, in.shiny=TRUE)})
+}
+
+# END OF GWR PART2
+
+
+
+}
+
 
 # Run the application 
 shinyApp(ui = ui, server = server)
