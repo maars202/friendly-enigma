@@ -39,13 +39,21 @@ varGwrLod <- c(
 )
 
 depVariables = c(
-  "price"="price",
-  "minimum_nights"="minimum_nights",
-  "minimum_nights2"="minimum_nights2"
+  "price"="price"
+  # "minimum_nights"="minimum_nights",
+  # "number_of_reviews" = "number_of_reviews",
+  #   "reviews_per_month" = "reviews_per_month", 
+  # "calculated_host_listings_count" = "calculated_host_listings_count",
+  # "availability_365" = "availability_365",
+  #   "number_of_reviews_ltm" = "number_of_reviews_ltm"
 )
 expVariables = c("price"="price",
                  "minimum_nights"="minimum_nights",
-                 "minimum_nights2"="minimum_nights2")
+                 "number_of_reviews" = "number_of_reviews",
+                 "reviews_per_month" = "reviews_per_month", 
+                 "calculated_host_listings_count" = "calculated_host_listings_count",
+                 "availability_365" = "availability_365",
+                 "number_of_reviews_ltm" = "number_of_reviews_ltm")
 
 
 kernelMethods = c("Gaussian"="Gaussian",
@@ -81,6 +89,8 @@ varGwrDistance <- c(
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
+  # theme = shinytheme("united"),
+  theme = shinytheme("superhero"),
   
   # Application title
   titlePanel("Simple Geo-Spatial Analysis using R and Shiny"),
