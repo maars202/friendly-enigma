@@ -99,12 +99,90 @@ ui <- fluidPage(
                       tags$h1("Happy Hideouts"),
                       tags$p("Welcome to our app, Happy Hideouts! We give the awesome opportunity to find out more about the Airbnb listings in the Singapore market which is much different from the rest of the world! Please use this user guide to guide your journey across our app."),
                       tags$h2("Geographically Weighted Regression"),
-                      uiOutput("user_guide"),
+                      uiOutput("user_guide_gwr"),
                       tags$p("The GWR is designed to provide you with accurate price estimates for various regions based on different independent variables such as minimum nights spent at listing. You can toggle between different independent variables such as minimum_nights to customize your price estimate. You can also choose other controls such as the type of distribution you would like, including Gaussian, Exponential, Tricube and more. You can also choose between adaptive bandwidth vs fixed bandwidth, although we have found that adaptive bandwidth provides better estimates based on geographical area.Alongside the price estimate, the app displays the Local R2 value. This value indicates how much of the variance in price is accounted for by the model for the specific estimate and region combination. A higher Local R2 value signifies a better fit of the model to the data. Good luck experimenting to get the best estimate for your needs!"),
                       tags$h4("Summary Chart:"),
                       tags$p("Summary Chart: For users interested in a deeper understanding of how the model works, we have also provided a mini summary chart at the bottom of the app. This chart offers insights into how the model works beneath the surface, allowing for a more scientific understanding of the price estimation process."),
-                      tags$h2("SSSP")
+                      tags$h2("Data Analytics"),
+                      uiOutput("user_guide_data_analytics"),
+                      tags$p("Consist of the exploratory data analysis of all the possible AirBnB datasets. What are the Datasets that we are using?\n"),
+                      tags$ul(
+                        tags$li("Listings - Summary information on listings"),
+                        tags$li("Detailed Listings - Detailed listing information of airbnb for rent"),
+                        tags$li("Calendar - Detailed calendar data for listings"),
+                        tags$li("Reviews - Summary review data"),
+                        tags$li("Detailed Reviews - Detailed review data for listings"),
+                        tags$li("Neighbourhoods - list of neighbourhoods in the city and a neighbourhood GeoJSON file"),
+                      ),
                       
+                      tags$h4("Available Charts to explore on Shiny App:"),
+                      tags$ul(
+                        tags$li("Room types by region"),
+                        tags$li("Pricing of Room Types"),
+                        tags$li("Room Types by Price and Region"),
+                        tags$li("Host Per year"),
+                        tags$li("Listings with no review"),
+                        tags$li("Review score by room type"),
+                      ),
+                      tags$h2("Second Order Analysis: K Function test by sub regions"),
+                      uiOutput("user_guide_second_order_analysis"),
+                      tags$ul(
+                        tags$li("Consists of the K functions results according to the regions that are selected and compares it against the different room types available in the region."),
+                        tags$li("Included insights and possible findings under the charts"),
+                      ),
+                      tags$h4("Regions available:"),
+                      tags$ul(
+                        tags$li("East Region"),
+                        tags$li("West Region"),
+                        tags$li("North Region"),
+                        tags$li("North East Region"),
+                        tags$li("Central Region"),
+                      ),
+                      tags$h5("Room types available for comparison of each region selected:"),
+                      tags$ul(
+                        tags$li("Hotel room"),
+                        tags$li("Entire home/ apartment"),
+                        tags$li("Private room"),
+                        tags$li("Shared room"),
+                      ),
+                      tags$p("Overall this discusses a spatial analysis approach to studying the clustering and competition among different types of listings (hotel rooms, entire homes, private rooms, and shared rooms) within a geographic study area. The analysis is performed using Ripley's K-function, which measures the number of events found within a certain distance of any particular event in a point pattern. This method helps to assess whether the point processes exhibit Complete Spatial Randomness (CSR) or whether there are signs of clustering or competition. The analysis uses the Kest() function from the spatstat package in R to compute the K-function and perform simulations to test the null hypothesis of CSR. The results are compared to theoretical values, and if the observed values fall outside the bounds of the theoretical values, it implies either clustering (above the upper bound) or competition (below the lower bound). The study examines different regions of Singapore (East, West, North, Northeast, and Central) and the four types of listings. The findings indicate varying degrees of clustering across regions and room types:"),
+                      tags$ul(
+                        tags$li("East Region: Observed clustering for entire homes and private rooms, but not for hotel or shared rooms due to limited data."),
+                        tags$li("West Region: Shared rooms exhibit spatial randomness, while private rooms and entire homes show clustering."),
+                        tags$li("North Region: Entire homes cluster over 0.2km, and shared rooms cluster under 0.3km. Private rooms also show clustering."),
+                        tags$li("Northeast Region: Clustering observed for entire homes and private rooms, but limited data for hotel and shared rooms."),
+                        tags$li("Central Region: The largest concentration of all room types, with evidence of clustering across all categories."),
+                      ),
+                      tags$p("In summary, the study uses Ripley's K-function to assess spatial patterns of different types of listings in various regions of Singapore. Clustering is observed in most room types across different regions, with some exceptions due to data limitations."),
+                      tags$h2("Second-Order Analysis: K-Test using Fast Fourier Transform"),
+                      uiOutput("user_guide_second_order_fast_fourier"),
+                      tags$p("This section describes the use of the Fast Fourier Transform (FFT) technique to perform a K-test analysis on large point patterns using the Kest.fft() function from the spatstat package in R. This method is an alternative to the traditional Kest() function and is more efficient for large datasets, as it discretizes the point pattern onto a rectangular raster and applies FFT to estimate the K-function."),
+                      tags$p("Key findings from the analysis include:"),
+                      tags$ul(
+                        tags$li("Efficiency: The Kest.fft() function is computationally faster, allowing for more simulations (e.g., 300) in a shorter amount of time (e.g., 44 seconds) compared to the minutes or hours it would take using Kest()."),
+                        tags$li("Setup: The data is set up as a list of ppp objects (point patterns) covering all of Singapore, split into different room types. The function uses a Gaussian smoothing kernel with a standard deviation (sigma) estimated using the bw.diggle() function."),
+                        tags$li("Results/ Selection on Shiny app: The K-test using FFT reveals the following patterns for different types of rooms across Singapore:",
+                                tags$ul(
+                                  tags$li("Hotel Rooms: Show signs of clustering at around 0.25 km, consistent with the concentration of hotels in the Central region."),
+                                  tags$li("Shared Rooms: Exhibit clustering across Singapore at a wider radius of 0.6 km, matching the distribution of shared rooms primarily in the Central region."),
+                                  tags$li("Private Rooms: Display signs of clustering at distances of 0.4 km and above."),
+                                  tags$li("Entire Homes/Apartments: Indicate clustering at distances of 0.3 km and up, consistent with previous observations."),
+                                ),),
+                      ),
+                      tags$p("In summary, the Kest.fft() function provides an efficient and insightful way to analyze large point patterns, revealing clustering trends across different types of room listings in Singapore at varying distances."),
+                        
+                      
+                      tags$h2("Kernel Density Estimation"),
+                      tags$p("The section describes the application of Kernel Density Estimation (KDE) to different room types in Singapore, aiming to identify neighbourhoods with high densities of listings. The analysis uses the bandwidth from previous K-tests to plot the density estimates for each room type."),
+                      tags$p("Key findings from the analysis include:"),
+                      tags$ul(
+                        tags$li("Private Rooms: Private rooms are primarily clustered in the Lavender area, with density spreading to nearby areas such as Kallang Bahru, Balestier, and Little India. Other clusters are found in Chinatown and surrounding areas, River Valley (including Leonie Hill and Oxley), and Aljunied. These areas are on the city fringe or close to the Central Business District and tend to have a good mix of rental and owner-occupied houses."),
+                        tags$li("Entire Homes/Apartments: The main clusters of entire homes and apartments are found in Balestier, with smaller densities in Lavender, Bendemeer, and Farrer Park. There is a high concentration in Chinatown, spreading to nearby areas like Anson and Raffles Place. The area around Orchard Road also has a high density of entire home listings, reflecting the popularity of these areas for investment or rental properties. Aljunied also has two distinct clusters of entire homes: one close to the city center and another near the MRT station."),
+                        tags$li("Shared Rooms: Shared rooms are concentrated in Lavender, spreading to nearby areas, although the overall density is lower than that of private rooms or entire homes/apartments. A small cluster of shared rooms is also present in the Chinatown area."),
+                        tags$li("Hotel Rooms: Hotel rooms are concentrated in the Chinatown and Boat Quay/Clarke Quay areas, which house smaller boutique hotels and low- to mid-tier hotels catering to business districts and tourists. The density of hotel rooms is comparable to that of private rooms."),
+                      ),
+                      tags$p("In summary, the KDE analysis reveals distinct spatial patterns for different types of room listings across Singapore, with private rooms, entire homes/apartments, shared rooms, and hotel rooms clustering in specific areas based on various factors such as proximity to the city center, public transport networks, and popular investment or rental properties.
+"),
              ),
              
              #START OF GWR PART1
@@ -333,9 +411,27 @@ server <- function(input, output, session) {
     "MSOA"="MSOA"
   )
   
-  output$user_guide <- renderUI({
+  output$user_guide_gwr <- renderUI({
     tags$img(src = "GWR_preview.png", height=400, width=700)
   })
+  
+  output$user_guide_data_analytics <- renderUI({
+    tags$img(src = "room_types_region.png", height=400, width=700)
+  })
+  
+  output$user_guide_second_order_analysis <- renderUI({
+    tags$img(src = "second_east.png", height=400, width=700)
+  }) 
+  
+  output$user_guide_second_order_fast_fourier <- renderUI({
+    tags$img(src = "hotel.png", height=400, width=700)
+  })
+  
+  user_guide_kernel_density_estimation <- renderUI({
+    tags$img(src = "kde_private_preview.png", height=400, width=700)
+  })
+  
+  
   
   
   output$distPlot <- renderPlot({
