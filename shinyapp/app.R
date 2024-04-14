@@ -30,8 +30,8 @@ library(RColorBrewer)
 library(shinycssloaders)
 
 # -----Load data files
-#load("data/ladbbox.rda")
-airbnb <- st_read("data/geospatial", layer = "airbnb")
+# airbnb <- st_read("data/geospatial", layer = "airbnb")
+airbnb <- st_read("data", layer = "airbnb")
 
 # Define UI for application that draws a histogram
 # Define varGwrLod
@@ -101,11 +101,7 @@ ui <- fluidPage(
                       
                       tags$h1("Happy Hideouts"),
                       tags$p("Welcome to our app, Happy Hideouts! We give the awesome opportunity to find out more about the Airbnb listings in the Singapore market which is much different from the rest of the world! Please use this user guide to guide your journey across our app."),
-                      tags$h2("Geographically Weighted Regression"),
-                      uiOutput("user_guide_gwr"),
-                      tags$p("The GWR is designed to provide you with accurate price estimates for various regions based on different independent variables such as minimum nights spent at listing. You can toggle between different independent variables such as minimum_nights to customize your price estimate. You can also choose other controls such as the type of distribution you would like, including Gaussian, Exponential, Tricube and more. You can also choose between adaptive bandwidth vs fixed bandwidth, although we have found that adaptive bandwidth provides better estimates based on geographical area.Alongside the price estimate, the app displays the Local R2 value. This value indicates how much of the variance in price is accounted for by the model for the specific estimate and region combination. A higher Local R2 value signifies a better fit of the model to the data. Good luck experimenting to get the best estimate for your needs!"),
-                      tags$h4("Summary Chart:"),
-                      tags$p("Summary Chart: For users interested in a deeper understanding of how the model works, we have also provided a mini summary chart at the bottom of the app. This chart offers insights into how the model works beneath the surface, allowing for a more scientific understanding of the price estimation process."),
+                      
                       tags$h2("Data Analytics"),
                       uiOutput("user_guide_data_analytics"),
                       tags$p("Consist of the exploratory data analysis of all the possible AirBnB datasets. What are the Datasets that we are using?\n"),
@@ -176,6 +172,7 @@ ui <- fluidPage(
                         
                       
                       tags$h2("Kernel Density Estimation"),
+                      uiOutput("user_guide_kde"),
                       tags$p("The section describes the application of Kernel Density Estimation (KDE) to different room types in Singapore, aiming to identify neighbourhoods with high densities of listings. The analysis uses the bandwidth from previous K-tests to plot the density estimates for each room type."),
                       tags$p("Key findings from the analysis include:"),
                       tags$ul(
@@ -186,6 +183,13 @@ ui <- fluidPage(
                       ),
                       tags$p("In summary, the KDE analysis reveals distinct spatial patterns for different types of room listings across Singapore, with private rooms, entire homes/apartments, shared rooms, and hotel rooms clustering in specific areas based on various factors such as proximity to the city center, public transport networks, and popular investment or rental properties.
 "),
+                      
+                      tags$h2("Geographically Weighted Regression"),
+                      uiOutput("user_guide_gwr"),
+                      tags$p("The GWR is designed to provide you with accurate price estimates for various regions based on different independent variables such as minimum nights spent at listing. You can toggle between different independent variables such as minimum_nights to customize your price estimate. You can also choose other controls such as the type of distribution you would like, including Gaussian, Exponential, Tricube and more. You can also choose between adaptive bandwidth vs fixed bandwidth, although we have found that adaptive bandwidth provides better estimates based on geographical area.Alongside the price estimate, the app displays the Local R2 value. This value indicates how much of the variance in price is accounted for by the model for the specific estimate and region combination. A higher Local R2 value signifies a better fit of the model to the data. Good luck experimenting to get the best estimate for your needs!"),
+                      tags$h4("Summary Chart:"),
+                      tags$p("For users interested in a deeper understanding of how the model works, we have also provided a mini summary chart at the bottom of the app. This chart offers insights into how the model works beneath the surface, allowing for a more scientific understanding of the price estimation process."),
+                      
              ),
              
              #START OF GWR PART1
@@ -279,51 +283,7 @@ ui <- fluidPage(
                                                           ))),
                                     mainPanel(width=9, fluid=TRUE,
                                               fluidRow(
-                                                # column(6,
-                                                #        leafletOutput("gwr1"),
-                                                #        column(6,
-                                                #               selectInput(inputId="Gwr1Reference",
-                                                #                           label="Reference Value",
-                                                #                           choices=c("Local R2"="Local_R2"
-                                                #                           ),
-                                                #                           selected=NULL,
-                                                #                           multiple=FALSE,
-                                                #                           width="100%"
-                                                #               ))
-                                                #        column(6,
-                                                #               selectInput(inputId="Gwr1Binning",
-                                                #                           label="Binning Method",
-                                                #                           choices=c("Std Deviation"="sd",
-                                                #                                     "Equal"="equal",
-                                                #                                     "Pretty"="pretty",
-                                                #                                     "Quantile"="quantile",
-                                                #                                     "K-means Cluster"="kmeans",
-                                                #                                     "Hierarchical Cluster"="hclust",
-                                                #                                     "Bagged Cluster"="bclust",
-                                                #                                     "Fisher"="fisher",
-                                                #                                     "Jenks"="jenks",
-                                                #                                     "Log10 Pretty"="log10_pretty"
-                                                #                           ),
-                                                #                           selected="quantile",
-                                                #                           multiple=FALSE,
-                                                #                           width="100%"
-                                                #               )),
-                                                #        sliderInput(inputId="Gwr1N",
-                                                #                    label="Select number of classes",
-                                                #                    min=2,
-                                                #                    max=30,
-                                                #                    value=5,
-                                                #                    width="100%"
-                                                #        )
-                                                # ),
-                                                
-                                                # {if (TRUE) {column(6,
-                                                #        leafletOutput("gwr9")),
-                                                # 
-                                                # column(6,
-                                                #        leafletOutput("gwr8"))} else {column(12,
-                                                #                                           leafletOutput("gwr9"))}},
-                                                
+                                              
                                                 column(6,
                                                        leafletOutput("gwr9") %>% withSpinner(color="#0dc5c1")),
                                                 
@@ -447,6 +407,9 @@ server <- function(input, output, session) {
     tags$img(src = "kde_private_preview.png", height=400, width=700)
   })
   
+  output$user_guide_kde <- renderUI({
+    tags$img(src = "kde_user_guide2.png", height=400, width=700)
+  })
   
   
   
@@ -938,12 +901,13 @@ output$gwr8 <- renderLeaflet({
   tmap_options(check.and.fix = TRUE)
   tmap_leaflet( rv$plot2, in.shiny=TRUE)})
 
-# END OF GWR PART2
-
-
 output$GwrSummary2 <- renderPrint({
   rv$Gwr
 })
+# END OF GWR PART2
+
+
+
 colors <- c("#ffffff", "#2c7bb6", "#abd9e9", "#fdae61", "#d7191c")
 clusters <- c("insignificant", "low-low", "low-high", "high-low", "high-high")
 #Lisa Plot
@@ -960,6 +924,7 @@ indicator <- pull(airbnb, input$inprice)
 lmoran <- localmoran(indicator, rswm)
 airbnb_lm <- cbind(airbnb, lmoran) |>
   rename(Pr.Ii = Pr.z....E.Ii..)
+
 quadrant <- vector(mode= "numeric" , length=nrow(lmoran))
 airbnb$lag <- lag.listw(rswm,indicator)
 DV <- airbnb$lag - mean(airbnb$lag)
@@ -972,6 +937,7 @@ signif <- as.numeric(input$inLisaSignificance)
 quadrant[airbnb_lm$Pr.Ii>signif] <- 0
 airbnb_lm$quadrant <- quadrant
 airbnb_lm <- st_make_valid(airbnb_lm)
+rv$airbnb_lm = airbnb_lm
 tm_shape(airbnb_lm) +
   tm_fill(col = "quadrant", 
           style = "cat", 
@@ -1002,7 +968,7 @@ output$reference <- renderPlot({
       tmStyle <- "fixed"
       tmpalette <- "-Blues"
     }
-  tm_shape(airbnb_lm) +
+  tm_shape(rv$airbnb_lm) +
       tm_fill(col = tmFill,
               title= tmTitle,
               style=tmStyle,
