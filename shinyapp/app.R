@@ -184,8 +184,13 @@ ui <- fluidPage(
                       tags$p("In summary, the KDE analysis reveals distinct spatial patterns for different types of room listings across Singapore, with private rooms, entire homes/apartments, shared rooms, and hotel rooms clustering in specific areas based on various factors such as proximity to the city center, public transport networks, and popular investment or rental properties.
 "),
                       
-                      tags$h2("Geographically Weighted Regression"),
+                      tags$h2("Geographically Weighted Regression (GWR)"),
+                      tags$h4("GWR Webpage:"),
                       uiOutput("user_guide_gwr"),
+                      
+                      tags$h4("GWR Responsive Loading Page when recalculation is triggered:"),
+                      uiOutput("user_guide_gwr2"),
+                      
                       tags$p("The GWR is designed to provide you with accurate price estimates for various regions based on different independent variables such as minimum nights spent at listing. You can toggle between different independent variables such as minimum_nights to customize your price estimate. You can also choose other controls such as the type of distribution you would like, including Gaussian, Exponential, Tricube and more. You can also choose between adaptive bandwidth vs fixed bandwidth, although we have found that adaptive bandwidth provides better estimates based on geographical area.Alongside the price estimate, the app displays the Local R2 value. This value indicates how much of the variance in price is accounted for by the model for the specific estimate and region combination. A higher Local R2 value signifies a better fit of the model to the data. Good luck experimenting to get the best estimate for your needs!"),
                       tags$h4("Summary Chart:"),
                       tags$p("For users interested in a deeper understanding of how the model works, we have also provided a mini summary chart at the bottom of the app. This chart offers insights into how the model works beneath the surface, allowing for a more scientific understanding of the price estimation process."),
@@ -389,6 +394,10 @@ server <- function(input, output, session) {
   
   output$user_guide_gwr <- renderUI({
     tags$img(src = "GWR_preview.png", height=400, width=700)
+  })
+  
+  output$user_guide_gwr2 <- renderUI({
+    tags$img(src = "GWR_loading_page.png", height=400, width=700)
   })
   
   output$user_guide_data_analytics <- renderUI({
