@@ -93,10 +93,10 @@ ui <- fluidPage(
   theme = shinytheme("superhero"),
   
   # Application title
-  titlePanel("Simple Geo-Spatial Analysis using R and Shiny"),
+  titlePanel("Geo-Spatial Analysis using R & Shiny for AirBnb"),
   
   # -----Navigation Bar
-  navbarPage("SGSAS", fluid=TRUE, windowTitle="Simple Geo-Spatial Analysis using R and Shiny ", selected="user_guide",
+  navbarPage("Happy Hideouts", fluid=TRUE, windowTitle="Geo-Spatial Analysis using R & Shiny for AirBnb", selected="user_guide",
              tabPanel("User Guide", value="user_guide", fluid=TRUE,
                       
                       tags$h1("Happy Hideouts"),
