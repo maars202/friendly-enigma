@@ -397,7 +397,7 @@ ui <- fluidPage(
                           textOutput("kde_result")
                         )
                       )
-             )
+             ),
              tabPanel("ESDA", value="esda", fluid=TRUE, icon=icon("globe-americas"),
                               sidebarLayout(position="left", fluid=TRUE,
                                 sidebarPanel(width=3, fluid=TRUE,
