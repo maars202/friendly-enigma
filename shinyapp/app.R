@@ -31,6 +31,7 @@ library(shinycssloaders)
 
 # -----Load data files
 #load("data/ladbbox.rda")
+airbnb <- st_read("data/geospatial", layer = "airbnb")
 
 # Define UI for application that draws a histogram
 # Define varGwrLod
@@ -82,6 +83,8 @@ varGwrDistance <- c(
   "Euclidean"=2,
   "Manhattan"=1
 )
+airbnb <- airbnb |> rename(mean_price = men_prc, median_price = mdn_prc, max_price = max_prc, min_price = min_prc)
+varprice <- c("mean_price", "median_price", "max_price", "min_price")
 
 
 # Define UI for application that draws a histogram
@@ -395,6 +398,19 @@ ui <- fluidPage(
                         )
                       )
              )
+             tabPanel("ESDA", value="esda", fluid=TRUE, icon=icon("globe-americas"),
+                              sidebarLayout(position="left", fluid=TRUE,
+                                sidebarPanel(width=3, fluid=TRUE,
+                                  selectInput(inputId="inprice", label="Price Measure", choices=varprice, selected="mean_price", multiple=FALSE,width="100%")),
+                                mainPanel(width = 9, 
+                                  fluidRow(
+                                    column(6, plotOutput("lisa"),
+                                      column(6, selectInput(inputId="inLisaMethod", label="Analysis Method", choices=c("Contiguity Queen"="q", "Contiguity Rook"="r"), selected="q", multiple=FALSE, width="100%")),
+                                    column(6, selectInput(inputId="inLisaSignificance", label="Confidence Level", choices=c("90%"=0.1, "95%"=0.05, "99%"=0.01, "99.9%"=0.001), selected=0.05, multiple=FALSE, width="100%"))),
+                                    column(6, plotOutput("reference"),
+                                      column(6, selectInput(inputId="inReference", label="Reference Value", choices=c("Price"="r", "Local Moran's I"="i", "P-Value"="p"), selected="p", multiple=FALSE, width="100%")), 
+                                      column(6, conditionalPanel(condition="input.inReference!='p'", selectInput(inputId="inBinning", label="Binning Method", choices=c("Std Deviation"="sd", "Equal"="equal", "Pretty"="pretty", "Quantile"="quantile", "K-means Cluster"="kmeans", "Hierarchical Cluster"="hclust","Bagged Cluster"="bclust","Fisher"="fisher","Jenks"="jenks", "Log10 Pretty"="log10_pretty"), selected="quantile", multiple=FALSE, width="100%"))),
+                                      conditionalPanel(condition="input.inReference!='p'", sliderInput(inputId="inN", label="Select number of classes", min=2, max=10, value=5, width="100%")))))))
              
   )
 )
@@ -927,6 +943,81 @@ output$gwr8 <- renderLeaflet({
 
 output$GwrSummary2 <- renderPrint({
   rv$Gwr
+})
+colors <- c("#ffffff", "#2c7bb6", "#abd9e9", "#fdae61", "#d7191c")
+clusters <- c("insignificant", "low-low", "low-high", "high-low", "high-high")
+#Lisa Plot
+output$lisa <- renderPlot({
+    if (input$inLisaMethod=="q") {
+      wm <- poly2nb(airbnb, queen=TRUE)
+      rswm <- nb2listw(wm, style = "W",  zero.policy=TRUE)
+    }
+    else {
+      wm <- poly2nb(airbnb, queen=FALSE)
+      rswm <- nb2listw(wm, style = "W", zero.policy=TRUE)
+    }
+indicator <- pull(airbnb, input$inprice)
+lmoran <- localmoran(indicator, rswm)
+airbnb_lm <- cbind(airbnb, lmoran) |>
+  rename(Pr.Ii = Pr.z....E.Ii..)
+quadrant <- vector(mode= "numeric" , length=nrow(lmoran))
+airbnb$lag <- lag.listw(rswm,indicator)
+DV <- airbnb$lag - mean(airbnb$lag)
+lm_i <- lmoran[,1] - mean(lmoran[,1])
+quadrant[DV <0 & lm_i>0] <- 1
+quadrant[DV >0 & lm_i<0] <- 2
+quadrant[DV <0 & lm_i<0] <- 3  
+quadrant[DV >0 & lm_i>0] <- 4  
+signif <- as.numeric(input$inLisaSignificance)
+quadrant[airbnb_lm$Pr.Ii>signif] <- 0
+airbnb_lm$quadrant <- quadrant
+airbnb_lm <- st_make_valid(airbnb_lm)
+tm_shape(airbnb_lm) +
+  tm_fill(col = "quadrant", 
+          style = "cat", 
+          palette = colors[c(sort(unique(quadrant)))+1], 
+          labels = clusters[c(sort(unique(quadrant)))+1],
+          popup.vars = c("")) +
+  tm_view(set.zoom.limits = c(11,17)) +
+  tm_borders(alpha=0.5) + 
+  tmap_options(check.and.fix = TRUE)
+}) 
+#Price, p-value and moran I stat plot
+output$reference <- renderPlot({
+     if (input$inReference=="r"){
+      tmFill <- input$inprice
+      tmTitle <- "Prices"
+      tmStyle <- input$inBinning
+      tmpalette <- "YlOrRd"
+    }
+    else if (input$inReference=="i"){
+      tmFill <- "Ii"
+      tmTitle <- "I-Values"
+      tmStyle <- input$inBinning
+      tmpalette <-"RdBu"
+    }
+    else {
+      tmFill <- "Pr.Ii"
+      tmTitle <- "P-Values"
+      tmStyle <- "fixed"
+      tmpalette <- "-Blues"
+    }
+  tm_shape(airbnb_lm) +
+      tm_fill(col = tmFill,
+              title= tmTitle,
+              style=tmStyle,
+              n=input$inN,
+              breaks=c(0,0.001,0.01,0.05,0.1,1),
+              palette= tmpalette,
+              midpoint=0,
+              popup.vars=c("Prices"=input$inprice, "P_Value:"="Pr.Ii","Local_Moran's_I:"="Ii"),
+              alpha=0.8,
+              legend.format=list(digits=3)) +
+      tm_borders(alpha=0.8) +
+      tm_view(view.legend.position=c("right","top"),
+              control.position=c("left","bottom"),
+              colorNA="Black") 
+   
 })
 
 
