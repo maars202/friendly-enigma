@@ -40,14 +40,8 @@ varGwrLod <- c(
 
 depVariables = c(
   "price"="price"
-  # "minimum_nights"="minimum_nights",
-  # "number_of_reviews" = "number_of_reviews",
-  #   "reviews_per_month" = "reviews_per_month", 
-  # "calculated_host_listings_count" = "calculated_host_listings_count",
-  # "availability_365" = "availability_365",
-  #   "number_of_reviews_ltm" = "number_of_reviews_ltm"
 )
-expVariables = c("price"="price",
+expVariables = c(
                  "minimum_nights"="minimum_nights",
                  "number_of_reviews" = "number_of_reviews",
                  "reviews_per_month" = "reviews_per_month", 
@@ -56,11 +50,12 @@ expVariables = c("price"="price",
                  "number_of_reviews_ltm" = "number_of_reviews_ltm")
 
 
-kernelMethods = c("Gaussian"="Gaussian",
+kernelMethods = c("Gaussian"="gaussian",
                   "Exponential"="exponential",
                   "Bisquare"="bisquare",
                   "Tricube"="tricube",
                   "Boxcar"="boxcar")
+
 
 # GWR Approach
 varGwrApproach <- c(
@@ -96,7 +91,20 @@ ui <- fluidPage(
   titlePanel("Simple Geo-Spatial Analysis using R and Shiny"),
   
   # -----Navigation Bar
-  navbarPage("SGSAS", fluid=TRUE, windowTitle="Simple Geo-Spatial Analysis using R and Shiny ", selected="eda",
+  navbarPage("SGSAS", fluid=TRUE, windowTitle="Simple Geo-Spatial Analysis using R and Shiny ", selected="user_guide",
+             tabPanel("User Guide", value="user_guide", fluid=TRUE,
+                      
+                      tags$h1("Happy Hideouts"),
+                      tags$p("Welcome to our app, Happy Hideouts! We give the awesome opportunity to find out more about the Airbnb listings in the Singapore market which is much different from the rest of the world! Please use this user guide to guide your journey across our app."),
+                      tags$h2("Geographically Weighted Regression"),
+                      uiOutput("user_guide"),
+                      tags$p("The GWR is designed to provide you with accurate price estimates for various regions based on different independent variables such as minimum nights spent at listing. You can toggle between different independent variables such as minimum_nights to customize your price estimate. You can also choose other controls such as the type of distribution you would like, including Gaussian, Exponential, Tricube and more. You can also choose between adaptive bandwidth vs fixed bandwidth, although we have found that adaptive bandwidth provides better estimates based on geographical area.Alongside the price estimate, the app displays the Local R2 value. This value indicates how much of the variance in price is accounted for by the model for the specific estimate and region combination. A higher Local R2 value signifies a better fit of the model to the data. Good luck experimenting to get the best estimate for your needs!"),
+                      tags$h4("Summary Chart:"),
+                      tags$p("Summary Chart: For users interested in a deeper understanding of how the model works, we have also provided a mini summary chart at the bottom of the app. This chart offers insights into how the model works beneath the surface, allowing for a more scientific understanding of the price estimation process."),
+                      tags$h2("SSSP")
+                      
+             ),
+             
              #START OF GWR PART1
              tabPanel("GWR", value="gwr", fluid=TRUE, icon=icon("laptop-code"),
                       sidebarLayout(position="left", fluid=TRUE,
@@ -112,23 +120,28 @@ ui <- fluidPage(
                                                                         width="97%"
                                                             )),
                                                           fluidRow(       
-                                                            selectInput(inputId="DependentVariable",
-                                                                        label="Dependent Variable",
+                                                            selectInput(inputId="GwrY",
+                                                                        label="GwrY",
                                                                         choices=depVariables,
                                                                         selected="price",
                                                                         multiple=FALSE,
                                                                         width="97%"
                                                             )),
                                                           fluidRow(       
-                                                            selectInput(inputId="ExplanatoryVariable",
-                                                                        label="Explanatory Variable",
+                                                            selectInput(inputId="GwrX",
+                                                                        label="GwrX",
                                                                         choices=expVariables,
-                                                                        selected="minimum_nights",
+                                                                        selected=c("minimum_nights", 
+                                                                                   "number_of_reviews", 
+                                                                                   "reviews_per_month", 
+                                                                                   "calculated_host_listings_count", 
+                                                                                   "availability_365",
+                                                                                   "number_of_reviews_ltm"),
                                                                         multiple=TRUE,
                                                                         width="97%"
                                                             )),
                                                           fluidRow(       
-                                                            selectInput(inputId="KernelMethod",
+                                                            selectInput(inputId="GwrKernel",
                                                                         label="Kernel Method",
                                                                         choices=kernelMethods,
                                                                         selected="Gaussian",
@@ -193,7 +206,7 @@ ui <- fluidPage(
                                                 #                           selected=NULL,
                                                 #                           multiple=FALSE,
                                                 #                           width="100%"
-                                                #               )),
+                                                #               ))
                                                 #        column(6,
                                                 #               selectInput(inputId="Gwr1Binning",
                                                 #                           label="Binning Method",
@@ -238,7 +251,7 @@ ui <- fluidPage(
                                                 
                                               ),
                                               conditionalPanel(condition="input.GwrShowSummary==1",
-                                                               verbatimTextOutput(outputId="GwrSummary")
+                                                               verbatimTextOutput(outputId="GwrSummary2")
                                               )
                                               
                                     )
@@ -246,6 +259,10 @@ ui <- fluidPage(
                       )),
              
              #END OF GWR PART1
+             # 
+
+             
+             
              
              tabPanel("Data Analytics", value="data_analytics", fluid=TRUE,
                       sidebarLayout(
@@ -313,6 +330,10 @@ server <- function(input, output, session) {
     "Ward"="Ward",
     "MSOA"="MSOA"
   )
+  
+  output$user_guide <- renderUI({
+    tags$img(src = "GWR_preview.png", height=400, width=700)
+  })
   
   
   output$distPlot <- renderPlot({
@@ -445,118 +466,13 @@ server <- function(input, output, session) {
 
 
 # -----GWR functions
+
 observe({
-  rv$variableSelect <- input$GwrX
+  rv$variableSelect2 <- input$ExplanatoryVariable
   updateSelectInput(session, inputId="Gwr1Reference",
                     label="Reference Value",
                     choices=c("Local R2"="Local_R2",rv$variableSelect)
   )
-})
-
-
-output$gwr1 <- renderLeaflet({
-  
-  
-  if (input$GwrLod=="LAD") {
-    GwrDataSp <- maplad_sp
-    GwrDataSf <- maplad_sf
-    if (input$Gwr1Reference=="Local_R2"){
-      Gwr1Title <- "Local R2"
-    }
-    else {
-      Gwr1Title <- "Coefficients"
-    }
-  }
-  else if (input$GwrLod=="Ward") {
-    if (input$GwrY=="estimated_diabetes_prevalence") {
-      GwrDataSp <- mapward_sp[mapward_sp@data$estimated_diabetes_prevalence!=0,]
-      GwrDataSf <- mapward_sf[mapward_sf$estimated_diabetes_prevalence!=0,]
-    }
-    else {
-      GwrDataSp <- mapward_sp
-      GwrDataSf <- mapward_sf
-    }
-    if (input$Gwr1Reference=="Local_R2"){
-      Gwr1Title <- "Local R2"
-    }
-    else {
-      Gwr1Title <- "Coefficients"
-    }
-  }
-  else {
-    GwrDataSp <- mapmsoa_sp
-    GwrDataSf <- mapmsoa_sf
-    if (input$Gwr1Reference=="Local_R2"){
-      Gwr1Title <- "Local R2"
-    }
-    else {
-      Gwr1Title <- "Coefficients"
-    }
-  }
-  
-  if (input$GwrLad=="All"){
-    rv$subsetGwrView <- maprgn_sf[,"area_nm"]
-  }
-  else {
-    rv$subsetGwrView <- maplad_sf[maplad_sf$area_nm==input$GwrLad,"area_nm"]
-  }
-  
-  
-  GwrFormula <- as.formula(paste(input$GwrY,paste(input$GwrX, collapse="+"), sep="~"))
-  if (input$GwrAutoBandwidth==1) {
-    GwrBw <- bw.gwr(GwrFormula, data=GwrDataSp, approach=input$GwrApproach, kernel=input$GwrKernel, adaptive=input$GwrBandwidth, p=input$GwrDistance, longlat=FALSE)
-  }
-  else {
-    GwrBw <- input$ManualBandwidth
-  }
-  
-  rv$Gwr <- gwr.basic(GwrFormula, data=GwrDataSp, bw=GwrBw, kernel=input$GwrKernel, adaptive=input$GwrBandwidth, p=input$GwrDistance, longlat=FALSE, cv=TRUE)
-  var.n<-length(rv$Gwr$lm$coefficients)
-  dp.n<-length(rv$Gwr$lm$residuals)
-  rv$GwrDiagnostic <- as.data.frame(rv$Gwr$GW.diagnostic) %>%
-    mutate(lm_RSS=sum(rv$Gwr$lm$residuals^2)) %>%
-    mutate(lm_AIC=dp.n*log(lm_RSS/dp.n)+dp.n*log(2*pi)+dp.n+2*(var.n + 1)) %>%
-    mutate(lm_AICc=dp.n*log(lm_RSS/dp.n)+dp.n*log(2*pi)+dp.n+2*dp.n*(var.n+1)/(dp.n-var.n-2)) %>%
-    mutate(lm_R2=summary(rv$Gwr$lm)$r.squared) %>%
-    mutate(lm_R2.adj=summary(rv$Gwr$lm)$adj.r.squared) %>%
-    mutate(bw=rv$Gwr$GW.arguments$bw) %>%
-    mutate(dp.n=dp.n)
-  GwrSDF <- as.data.frame(rv$Gwr$SDF)
-  for (dim_ in rv$variableSelect) {
-    # GwrSDF[, paste0(dim_, "_PV")] <- pt(abs(GwrSDF[, paste0(dim_, "_TV")]),df=length(GwrSDF)-1,lower.tail=FALSE)*2
-    GwrSDF[, paste0(dim_, "_PV")] <- pt(abs(GwrSDF[, paste0(dim_, "_TV")]),df=rv$GwrDiagnostic$enp,lower.tail=FALSE)*2
-  }
-  
-  rv$GwrResult <- GwrDataSf %>%
-    select(area_id,area_nm,lad_id,lad_nm,geometry) %>%
-    cbind(., as.matrix(GwrSDF))
-  
-  gwr1Plot <- tm_shape(rv$GwrResult) +
-    tm_fill(input$Gwr1Reference,
-            title=Gwr1Title,
-            style=input$Gwr1Binning,
-            n=input$Gwr1N,
-            breaks=c(0,0.001,0.01,0.05,0.1,1),
-            palette="RdBu",
-            midpoint=0,
-            id="area_nm",
-            alpha=0.8,
-            legend.format=list(digits=3)
-    ) +
-    tm_borders(alpha=0.8
-    ) +
-    tm_view(view.legend.position=c("right","top"),
-            control.position=c("left","bottom"),
-            colorNA="Black"
-    ) +
-    tmap_options(basemaps=c("Esri.WorldGrayCanvas","Stamen.TonerLite","OpenStreetMap"),
-                 basemaps.alpha=c(0.8,0.5,0.7)
-    ) +
-    tm_shape(rv$subsetGwrView) +
-    tm_borders(col="black",
-               lwd=3)
-  tmap_leaflet(gwr1Plot, in.shiny=TRUE)
-  
 })
 
 
@@ -626,12 +542,55 @@ output$gwr2 <- renderLeaflet({
       tm_borders(col="black",
                  lwd=3)
     
-    airbnb_resale.sf.adaptive2 = read_rds("/Users/maarunipandithurai/Documents/Documents - Maaruni’s MacBook Pro/maars202/geospatial/gaproject/shinyapp/data/airbnb_resale.sf.adaptive.rds")
+    
+    # insert selections here:
+    # formula = price ~ input$ExplanatoryVariable[0]
+    # for (dim in input$ExplanatoryVariable){
+    #   formula = formula + dim
+    # }
+    GwrFormula <- as.formula(paste(input$DependentVariable,paste(input$ExplanatoryVariable, collapse="+"), sep="~"))
+    
+    airbnb_resale.sp = read_rds("/Users/maarunipandithurai/Documents/Documents - Maaruni’s MacBook Pro/maars202/geospatial/gaproject/shinyapp/data/airbnb_resale.sp")
+    GwrBw <- bw.gwr(GwrFormula, data=airbnb_resale.sp, approach=input$GwrApproach, kernel=input$GwrKernel, adaptive=input$GwrBandwidth, p=input$GwrDistance, longlat=FALSE)
+
+    rv$Gwr <- gwr.basic(GwrFormula,
+                              data=airbnb_resale.sp, bw=GwrBw,
+                              kernel = input$GwrKernel,
+                              adaptive=input$GwrBandwidth,
+                              longlat = FALSE)
+    
+    var.n<-length(rv$Gwr$lm$coefficients)
+    dp.n<-length(rv$Gwr$lm$residuals)
+    rv$GwrDiagnostic <- as.data.frame(rv$Gwr$GW.diagnostic) %>%
+      mutate(lm_RSS=sum(rv$Gwr$lm$residuals^2)) %>%
+      mutate(lm_AIC=dp.n*log(lm_RSS/dp.n)+dp.n*log(2*pi)+dp.n+2*(var.n + 1)) %>%
+      mutate(lm_AICc=dp.n*log(lm_RSS/dp.n)+dp.n*log(2*pi)+dp.n+2*dp.n*(var.n+1)/(dp.n-var.n-2)) %>%
+      mutate(lm_R2=summary(rv$Gwr$lm)$r.squared) %>%
+      mutate(lm_R2.adj=summary(rv$Gwr$lm)$adj.r.squared) %>%
+      mutate(bw=rv$Gwr$GW.arguments$bw) %>%
+      mutate(dp.n=dp.n)
+    GwrSDF <- as.data.frame(rv$Gwr$SDF)
+
+    
+    airbnb_resale.sf.adaptive <- st_as_sf(rv$Gwr$SDF) %>%
+      st_transform(crs=3414)
+
+    airbnb_resale.sf.adaptive.svy21 <- st_transform(airbnb_resale.sf.adaptive, 3414)
+
+    GwrSDF <- as.data.frame(rv$Gwr$SDF)
+    airbnb_resale.sf.adaptive2 <- cbind(airbnb_resale.res.sf, as.matrix(GwrSDF))
+
+    for (dim_ in rv$variableSelect) {
+      # GwrSDF[, paste0(dim_, "_PV")] <- pt(abs(GwrSDF[, paste0(dim_, "_TV")]),df=length(GwrSDF)-1,lower.tail=FALSE)*2
+      GwrSDF[, paste0(dim_, "_PV")] <- pt(abs(GwrSDF[, paste0(dim_, "_TV")]),df=rv$GwrDiagnostic$enp,lower.tail=FALSE)*2
+    }
+    
+    # airbnb_resale.sf.adaptive2 = read_rds("/Users/maarunipandithurai/Documents/Documents - Maaruni’s MacBook Pro/maars202/geospatial/gaproject/shinyapp/data/airbnb_resale.sf.adaptive.rds")
     mpsz_svy21_3 = read_rds("/Users/maarunipandithurai/Documents/Documents - Maaruni’s MacBook Pro/maars202/geospatial/gaproject/shinyapp/data/mpsz_svy21")
     gwr2Plot <- tm_shape(mpsz_svy21_3)+
       tm_polygons(alpha = 0.1) +
-      tm_shape(airbnb_resale.sf.adaptive2) +  
-      tm_dots(col = "Local_R2",
+      tm_shape(GwrSDF) +  
+      tm_dots(col = "y",
               border.col = "gray60",
               border.lwd = 1) +
       tm_view(set.zoom.limits = c(11,14))
@@ -642,6 +601,8 @@ output$gwr2 <- renderLeaflet({
   
   
 })
+
+h3(textOutput("caption"))
 
 output$showGwrR2 <- renderText ({
   as.character(round(rv$GwrDiagnostic$gwR2.adj,digits=7))
@@ -677,8 +638,10 @@ output$showGwrDp <- renderText ({
 })
 
 output$GwrSummary <- renderPrint({
-  rv$Gwr
+  rv$GwrAdapt
 })
+
+
 
 
 observe({
@@ -695,6 +658,8 @@ observe({
   input$Gwr1Reference
   input$Gwr1Binning
   input$Gwr1N
+  input$DependentVariable
+  input$ExplanatoryVariable
   #coordsGwr <- ladbbox[ladbbox$area_nm==input$GwrLad,c("xmin","ymin","xmax","ymax")]
   #if (!is.null(coordsGwr)) {
     leafletProxy("gwr1") %>%
@@ -731,6 +696,66 @@ output$gwr7 <- renderLeaflet({
 })
 #end of example 
 
+observe({
+  rv$variableSelect2 <- input$ExplanatoryVariable
+  updateSelectInput(session, inputId="Gwr1Reference",
+                    label="Reference Value",
+                    choices=c("Local R2"="Local_R2",rv$variableSelect2)
+  )
+  
+  # rv$variableSelectY2 <- input$DependentVariable
+  # updateSelectInput(session, inputId="DependentVariable",
+  #                   label="Reference Value",
+  #                   choices=c("price"="price",rv$variableSelectY2)
+  # )
+})
+
+# observe({
+#   rv$variableSelectY2 <- input$DependentVariable
+#   updateSelectInput(session, inputId="DependentVariable",
+#                     label="Reference Value",
+#                     choices=c("price"="price",rv$variableSelectY2)
+#   )
+# })
+
+# GwrFormula <- as.formula(paste(input$GwrY,paste(rv$GwrX, collapse="+"), sep="~"))
+# 
+# airbnb_resale.sp = read_rds("/Users/maarunipandithurai/Documents/Documents - Maaruni’s MacBook Pro/maars202/geospatial/gaproject/shinyapp/data/airbnb_resale.sp")
+# GwrBw <- bw.gwr(GwrFormula, data=airbnb_resale.sp, approach=input$GwrApproach, kernel=input$GwrKernel, adaptive=input$GwrBandwidth, p=input$GwrDistance, longlat=FALSE)
+# 
+# rv$Gwr <- gwr.basic(GwrFormula,
+#                     data=airbnb_resale.sp, bw=GwrBw,
+#                     kernel = input$GwrKernel,
+#                     adaptive=input$GwrBandwidth,
+#                     longlat = FALSE)
+# 
+# var.n<-length(rv$Gwr$lm$coefficients)
+# dp.n<-length(rv$Gwr$lm$residuals)
+# rv$GwrDiagnostic <- as.data.frame(rv$Gwr$GW.diagnostic) %>%
+#   mutate(lm_RSS=sum(rv$Gwr$lm$residuals^2)) %>%
+#   mutate(lm_AIC=dp.n*log(lm_RSS/dp.n)+dp.n*log(2*pi)+dp.n+2*(var.n + 1)) %>%
+#   mutate(lm_AICc=dp.n*log(lm_RSS/dp.n)+dp.n*log(2*pi)+dp.n+2*dp.n*(var.n+1)/(dp.n-var.n-2)) %>%
+#   mutate(lm_R2=summary(rv$Gwr$lm)$r.squared) %>%
+#   mutate(lm_R2.adj=summary(rv$Gwr$lm)$adj.r.squared) %>%
+#   mutate(bw=rv$Gwr$GW.arguments$bw) %>%
+#   mutate(dp.n=dp.n)
+# GwrSDF <- as.data.frame(rv$Gwr$SDF)
+# 
+# 
+# airbnb_resale.sf.adaptive <- st_as_sf(rv$Gwr$SDF) %>%
+#   st_transform(crs=3414)
+# 
+# airbnb_resale.sf.adaptive.svy21 <- st_transform(airbnb_resale.sf.adaptive, 3414)
+# 
+# GwrSDF <- as.data.frame(rv$Gwr$SDF)
+# airbnb_resale.sf.adaptive2 <- cbind(airbnb_resale.res.sf, as.matrix(GwrSDF))
+# 
+# for (dim_ in rv$variableSelect2) {
+#   # GwrSDF[, paste0(dim_, "_PV")] <- pt(abs(GwrSDF[, paste0(dim_, "_TV")]),df=length(GwrSDF)-1,lower.tail=FALSE)*2
+#   GwrSDF[, paste0(dim_, "_PV")] <- pt(abs(GwrSDF[, paste0(dim_, "_TV")]),df=rv$GwrDiagnostic$enp,lower.tail=FALSE)*2
+# }
+
+
 airbnb_resale.sf.adaptive2 = read_rds("/Users/maarunipandithurai/Documents/Documents - Maaruni’s MacBook Pro/maars202/geospatial/gaproject/shinyapp/data/airbnb_resale.sf.adaptive.rds")
 mpsz_svy21_3 = read_rds("/Users/maarunipandithurai/Documents/Documents - Maaruni’s MacBook Pro/maars202/geospatial/gaproject/shinyapp/data/mpsz_svy21")
 coefficientEstimatesPlot = TRUE
@@ -763,22 +788,97 @@ if (coefficientEstimatesPlot == FALSE){gwr2Plot <- tm_shape(mpsz_svy21_3)+
             border.col = "gray60",
             border.lwd = 1, palette = "YlGn") +
     tm_view(set.zoom.limits = c(11,14)) 
-  gwr1Plot = number_of_reviews_SE
+  # gwr1Plot = number_of_reviews_SE
   gwr2Plot = number_of_reviews_TV
   # gwr2Plot = tmap_arrange(number_of_reviews_SE, number_of_reviews_TV,  asp=1, ncol=2, sync = TRUE)
 }
 
-output$gwr9 <- renderLeaflet({
-  tmap_options(check.and.fix = TRUE)
-  tmap_leaflet(gwr2Plot, in.shiny=TRUE)})
 
-if (!is.null(gwr1Plot)){
+output$gwr9 <- renderLeaflet({
+  
+  GwrFormula <- as.formula(paste(input$GwrY,paste(input$GwrX, collapse="+"), sep="~"))
+  airbnb_resale.sp = read_rds("/Users/maarunipandithurai/Documents/Documents - Maaruni’s MacBook Pro/maars202/geospatial/gaproject/shinyapp/data/airbnb_resale.sp")
+  mpsz_svy21_3 = read_rds("/Users/maarunipandithurai/Documents/Documents - Maaruni’s MacBook Pro/maars202/geospatial/gaproject/shinyapp/data/mpsz_svy21")
+  airbnb_resale.res.sf = read_rds("/Users/maarunipandithurai/Documents/Documents - Maaruni’s MacBook Pro/maars202/geospatial/gaproject/shinyapp/data/airbnb_resale.res.sf")
+  GwrBw <- bw.gwr(GwrFormula, data=airbnb_resale.sp, approach=input$GwrApproach, kernel=input$GwrKernel, adaptive=FALSE, longlat=FALSE)
+  rv$Gwr <- gwr.basic(GwrFormula,
+                      data=airbnb_resale.sp, bw=GwrBw,
+                      kernel = input$GwrKernel,
+                      adaptive=input$GwrBandwidth,
+                      longlat = FALSE)
+  # 
+  var.n<-length(rv$Gwr$lm$coefficients)
+  dp.n<-length(rv$Gwr$lm$residuals)
+  rv$GwrDiagnostic <- as.data.frame(rv$Gwr$GW.diagnostic) %>%
+    mutate(lm_RSS=sum(rv$Gwr$lm$residuals^2)) %>%
+    mutate(lm_AIC=dp.n*log(lm_RSS/dp.n)+dp.n*log(2*pi)+dp.n+2*(var.n + 1)) %>%
+    mutate(lm_AICc=dp.n*log(lm_RSS/dp.n)+dp.n*log(2*pi)+dp.n+2*dp.n*(var.n+1)/(dp.n-var.n-2)) %>%
+    mutate(lm_R2=summary(rv$Gwr$lm)$r.squared) %>%
+    mutate(lm_R2.adj=summary(rv$Gwr$lm)$adj.r.squared) %>%
+    mutate(bw=rv$Gwr$GW.arguments$bw) %>%
+    mutate(dp.n=dp.n)
+  GwrSDF <- as.data.frame(rv$Gwr$SDF)
+  # 
+  
+  airbnb_resale.sf.adaptive <- st_as_sf(rv$Gwr$SDF) %>%
+    st_transform(crs=3414)
+  
+  airbnb_resale.sf.adaptive.svy21 <- st_transform(airbnb_resale.sf.adaptive, 3414)
+  
+  airbnb_resale.sf.adaptive2 <- cbind(airbnb_resale.res.sf, as.matrix(as.data.frame(rv$Gwr$SDF)))
+  
+  # write_rds(airbnb_resale.sf.adaptive2, file = "/Users/maarunipandithurai/Documents/Documents - Maaruni’s MacBook Pro/maars202/geospatial/gaproject/shinyapp/data/airbnb_resale.sf.adaptive2")
+  # airbnb_resale.sf.adaptive2 = read_rds("/Users/maarunipandithurai/Documents/Documents - Maaruni’s MacBook Pro/maars202/geospatial/gaproject/shinyapp/data/airbnb_resale.sf.adaptive2")
+  
+  for (dim_ in rv$variableSelect2) {
+    # GwrSDF[, paste0(dim_, "_PV")] <- pt(abs(GwrSDF[, paste0(dim_, "_TV")]),df=length(GwrSDF)-1,lower.tail=FALSE)*2
+    GwrSDF[, paste0(dim_, "_PV")] <- pt(abs(GwrSDF[, paste0(dim_, "_TV")]),df=rv$GwrDiagnostic$enp,lower.tail=FALSE)*2
+  }
+  
+  
+  
+  # airbnb_resale.sf.adaptive2 = read_rds("/Users/maarunipandithurai/Documents/Documents - Maaruni’s MacBook Pro/maars202/geospatial/gaproject/shinyapp/data/airbnb_resale.sf.adaptive.rds")
+  tmap_mode("view")
+  number_of_reviews_SE <- tm_shape(mpsz_svy21_3)+
+    tm_polygons(alpha = 0.1) +
+    tm_shape(airbnb_resale.sf.adaptive2) +  
+    tm_dots(col = "y",
+            border.col = "gray60",
+            border.lwd = 1) +
+    tm_view(set.zoom.limits = c(11,14))
+  
+  number_of_reviews_TV <- tm_shape(mpsz_svy21_3)+
+    tm_polygons(alpha = 0.1) +
+    tm_shape(airbnb_resale.sf.adaptive2) +  
+    tm_dots(col = "Local_R2",
+            size = 0.15,
+            border.col = "gray60",
+            border.lwd = 1, palette = "YlGn") +
+    tm_view(set.zoom.limits = c(11,14)) 
+  gwr1Plot = number_of_reviews_SE
+  gwr2Plot = number_of_reviews_TV
+  
+  
+  
+  
+  rv$plot2 = number_of_reviews_SE
+  tmap_options(check.and.fix = TRUE)
+  tmap_leaflet(gwr2Plot, in.shiny=TRUE)
+  
+  }
+  )
+
+
 output$gwr8 <- renderLeaflet({
   tmap_options(check.and.fix = TRUE)
-  tmap_leaflet(gwr1Plot, in.shiny=TRUE)})
-}
+  tmap_leaflet( rv$plot2, in.shiny=TRUE)})
 
 # END OF GWR PART2
+
+
+output$GwrSummary2 <- renderPrint({
+  rv$Gwr
+})
 
 
 
