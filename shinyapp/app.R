@@ -977,6 +977,12 @@ output$reference <- renderPlot({
       tmStyle <- "fixed"
       tmpalette <- "-Blues"
     }
+wm <- poly2nb(airbnb, queen=TRUE)
+rswm <- nb2listw(wm, style = "W",  zero.policy=TRUE)
+indicator <- pull(airbnb, input$inprice)
+lmoran <- localmoran(indicator, rswm)
+airbnb_lm <- cbind(airbnb, lmoran) |>
+  rename(Pr.Ii = Pr.z....E.Ii..)
   tm_shape(rv$airbnb_lm) +
       tm_fill(col = tmFill,
               title= tmTitle,
